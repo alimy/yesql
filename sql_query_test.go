@@ -6,7 +6,7 @@ import (
 
 func TestScannerErrTags(t *testing.T) {
 	for _, key := range []string{"missing", "doubloon"} {
-		_, err := ParseFile("tests/samples/tag_" + key + ".sql")
+		_, err := ParseFile("testdata/tag_" + key + ".sql")
 		if err == nil {
 			t.Errorf("Expected error, but got nil.")
 		}
@@ -14,7 +14,7 @@ func TestScannerErrTags(t *testing.T) {
 }
 
 func TestScannerValid(t *testing.T) {
-	file := "tests/samples/valid.sql"
+	file := "testdata/valid.sql"
 
 	sqlQuery, err := ParseFile(file)
 	if err != nil {

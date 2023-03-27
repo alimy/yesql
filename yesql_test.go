@@ -10,7 +10,7 @@ func TestMustParseFilePanic(t *testing.T) {
 			t.Errorf("MustParseFile should panic if an error occurs, got '%s'", r)
 		}
 	}()
-	MustParseFile("tests/samples/missing.sql")
+	MustParseFile("testdata/missing.sql")
 }
 
 func TestMustParseFileNoPanic(t *testing.T) {
@@ -19,7 +19,7 @@ func TestMustParseFileNoPanic(t *testing.T) {
 			t.Errorf("MustParseFile should not panic if no error occurs, got '%s'", r)
 		}
 	}()
-	MustParseFile("tests/samples/valid.sql")
+	MustParseFile("testdata/valid.sql")
 }
 
 func TestMustParseBytesPanic(t *testing.T) {
@@ -53,7 +53,7 @@ func TestScan(t *testing.T) {
 		q2 Q2
 	)
 
-	queries := MustParseFile("tests/samples/valid.sql")
+	queries := MustParseFile("testdata/valid.sql")
 	err := Scan(&q, queries, NewPrepareHook(nil))
 	if err != nil {
 		t.Errorf("failed to scan raw query to struct: %v", err)
@@ -67,6 +67,6 @@ func TestScan(t *testing.T) {
 
 func BenchmarkMustParseFile(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		MustParseFile("tests/samples/valid.sql")
+		MustParseFile("testdata/valid.sql")
 	}
 }
