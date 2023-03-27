@@ -56,7 +56,7 @@ func (s *prepareScanner) scan(ctx context.Context, obj any, query SQLQuery) erro
 				} else {
 					tagVaule = tg[0]
 				}
-				if field.Type.Name() == "Namespace" {
+				if field.Type.Name() == "Scope" {
 					namespace = tagVaule
 					continue
 				}

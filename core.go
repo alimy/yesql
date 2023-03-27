@@ -5,8 +5,8 @@ import (
 	"reflect"
 )
 
-// Namespace just a placeholder type for indicate namespace of object
-type Namespace any
+// Scope just a placeholder type for indicate namespace of object
+type Scope any
 
 // Query is a parsed query along with tags.
 type Query struct {
