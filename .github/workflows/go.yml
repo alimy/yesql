@@ -1,0 +1,58 @@
+name: Go
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.golangci.yml'
+      - '.github/workflows/go.yml'
+  pull_request:
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.golangci.yml'
+      - '.github/workflows/go.yml'
+env:
+  GOPROXY: "https://proxy.golang.org"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    strategy:
+      matrix:
+        go-version: [ 1.18.x, 1.19.x, 1.20.x ]
+        platform: [ ubuntu-latest, macos-latest ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run tests
+        run: go test -v ./...
+      
+  # Running tests with race detection consumes too much memory on Windows,
+  # see https://github.com/golang/go/issues/46099 for details.
+  test-windows:
+    name: TestOnWindows
+    strategy:
+      matrix:
+        go-version: [ 1.18.x, 1.19.x, 1.20.x ]
+        platform: [ windows-latest ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run tests
+        run: go test -v ./...
