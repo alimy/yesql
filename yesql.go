@@ -8,16 +8,34 @@ package yesql
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
 var (
 	_structTag             = "yesql"
 	_defaultPrepareScanner PrepareScanner
+	_defaultQueryHooks     []func(query *Query) (*Query, error)
 )
+
+// Use use default prepare scanner with *sql.DB
+func Use(db *sql.DB) {
+	prepareHook := NewPrepareHook(db)
+	scanner := NewPrepareScanner(prepareHook)
+	SetDefaultPrepareScanner(scanner)
+}
+
+// UseSqlx use default prepare scanner with *sql.DB
+func UseSqlx(db *sqlx.DB) {
+	prepareHook := NewSqlxPrepareHook(db)
+	scanner := NewPrepareScanner(prepareHook)
+	SetDefaultPrepareScanner(scanner)
+}
 
 // SetDeafultTag set default struct tag
 func SetDefaultTag(tag string) {
@@ -31,6 +49,16 @@ func SetDefaultTag(tag string) {
 func SetDefaultPrepareScanner(scanner PrepareScanner) {
 	if scanner != nil {
 		_defaultPrepareScanner = scanner
+	}
+}
+
+// SetDefaultQueryHooks set default query hooks
+func SetDefaultQueryHooks(hooks ...func(query *Query) (*Query, error)) {
+	_defaultQueryHooks = nil
+	for _, hook := range hooks {
+		if hook != nil {
+			_defaultQueryHooks = append(_defaultQueryHooks, hook)
+		}
 	}
 }
 
@@ -66,13 +94,13 @@ func MustParseBytes(b []byte, hooks ...func(query *Query) (*Query, error)) SQLQu
 	if err != nil {
 		panic(err)
 	}
-
 	return queries
 }
 
 // ParseReader takes an io.Reader and returns Queries or an error.
 func ParseReader(reader io.Reader, hooks ...func(query *Query) (*Query, error)) (SQLQuery, error) {
 	query := newSqlQuery()
+	query.AddHooks(_defaultQueryHooks...)
 	query.AddHooks(hooks...)
 	if err := query.parseReader(reader); err != nil {
 		return nil, err

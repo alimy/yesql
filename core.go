@@ -35,3 +35,5 @@ type PrepareHook interface {
 	Prepare(field reflect.Type, query string) (any, error)
 	PrepareContext(ctx context.Context, field reflect.Type, query string) (any, error)
 }
+
+type QueryFunc func(query *Query) (*Query, error)
