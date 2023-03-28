@@ -2,11 +2,8 @@ package yesql
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"reflect"
-
-	"github.com/jmoiron/sqlx"
 )
 
 var (
@@ -15,11 +12,11 @@ var (
 )
 
 type stdPrepareHook struct {
-	db *sql.DB
+	db PrepareContext
 }
 
 type sqlxPrepareHook struct {
-	db *sqlx.DB
+	db PreparexContext
 }
 
 func (s *stdPrepareHook) Prepare(field reflect.Type, query string) (any, error) {
@@ -29,7 +26,7 @@ func (s *stdPrepareHook) Prepare(field reflect.Type, query string) (any, error) 
 		return query, nil
 	case "*sql.Stmt":
 		// Prepared query.
-		stmt, err := s.db.Prepare(query)
+		stmt, err := s.db.PrepareContext(context.Background(), query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
@@ -63,14 +60,14 @@ func (s *sqlxPrepareHook) Prepare(field reflect.Type, query string) (any, error)
 		return query, nil
 	case "*sqlx.Stmt":
 		// Prepared query.
-		stmt, err := s.db.Preparex(query)
+		stmt, err := s.db.PreparexContext(context.Background(), query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
 		return stmt, nil
 	case "*sqlx.NamedStmt":
 		// Prepared query.
-		stmt, err := s.db.PrepareNamed(query)
+		stmt, err := s.db.PrepareNamedContext(context.Background(), query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
@@ -105,14 +102,14 @@ func (s *sqlxPrepareHook) PrepareContext(ctx context.Context, field reflect.Type
 }
 
 // NewPrepareHook create a prepare hook with *sql.DB
-func NewPrepareHook(db *sql.DB) PrepareHook {
+func NewPrepareHook(db PrepareContext) PrepareHook {
 	return &stdPrepareHook{
 		db: db,
 	}
 }
 
 // NewSqlxPrepareHook create a prepare hook with *sqlx.DB
-func NewSqlxPrepareHook(db *sqlx.DB) PrepareHook {
+func NewSqlxPrepareHook(db PreparexContext) PrepareHook {
 	return &sqlxPrepareHook{
 		db: db,
 	}

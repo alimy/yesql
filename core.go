@@ -2,7 +2,10 @@ package yesql
 
 import (
 	"context"
+	"database/sql"
 	"reflect"
+
+	"github.com/jmoiron/sqlx"
 )
 
 // Namespace just a placeholder type for indicate namespace of object
@@ -32,8 +35,24 @@ type PrepareScanner interface {
 
 // PrepareHook prepare hook for scan object
 type PrepareHook interface {
-	Prepare(field reflect.Type, query string) (any, error)
 	PrepareContext(ctx context.Context, field reflect.Type, query string) (any, error)
 }
 
-type QueryFunc func(query *Query) (*Query, error)
+// PrepareContext enhances the Conn interface with context.
+type PrepareContext interface {
+	// PreparexContext returns a prepared statement, bound to this connection.
+	// context is for the preparation of the statement,
+	// it must not store the context within the statement itself.
+	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
+}
+
+// PreparexContext enhances the Conn interface with context.
+type PreparexContext interface {
+	// PrepareContext prepares a statement.
+	// The provided context is used for the preparation of the statement, not for
+	// the execution of the statement.
+	PreparexContext(ctx context.Context, query string) (*sqlx.Stmt, error)
+
+	// PrepareNamedContext returns an sqlx.NamedStmt
+	PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error)
+}

@@ -22,14 +22,10 @@ func (s *prepareScanner) SetPrepareHook(hook PrepareHook) {
 }
 
 func (s *prepareScanner) Scan(obj any, query SQLQuery) error {
-	return s.scan(nil, obj, query)
+	return s.ScanContext(context.Background(), obj, query)
 }
 
 func (s *prepareScanner) ScanContext(ctx context.Context, obj any, query SQLQuery) error {
-	return s.scan(ctx, obj, query)
-}
-
-func (s *prepareScanner) scan(ctx context.Context, obj any, query SQLQuery) error {
 	ob := reflect.ValueOf(obj)
 	if ob.Kind() == reflect.Ptr {
 		ob = ob.Elem()
@@ -79,7 +75,7 @@ func (s *prepareScanner) scan(ctx context.Context, obj any, query SQLQuery) erro
 		}
 		var v any
 		if ctx == nil {
-			v, err = s.prepareHook.Prepare(value.Type(), qv.Query)
+			v, err = s.prepareHook.PrepareContext(context.Background(), value.Type(), qv.Query)
 		} else {
 			v, err = s.prepareHook.PrepareContext(ctx, value.Type(), qv.Query)
 		}

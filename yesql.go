@@ -1,20 +1,16 @@
 // Package yesql is a Go port of Yesql
 //
 // It allows you to write SQL queries in separate files.
-//
 // See rationale at https://github.com/krisajenkins/yesql#rationale
 package yesql
 
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"fmt"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/jmoiron/sqlx"
 )
 
 var (
@@ -24,14 +20,14 @@ var (
 )
 
 // Use use default prepare scanner with *sql.DB
-func Use(db *sql.DB) {
+func Use(db PrepareContext) {
 	prepareHook := NewPrepareHook(db)
 	scanner := NewPrepareScanner(prepareHook)
 	SetDefaultPrepareScanner(scanner)
 }
 
 // UseSqlx use default prepare scanner with *sql.DB
-func UseSqlx(db *sqlx.DB) {
+func UseSqlx(db PreparexContext) {
 	prepareHook := NewSqlxPrepareHook(db)
 	scanner := NewPrepareScanner(prepareHook)
 	SetDefaultPrepareScanner(scanner)
