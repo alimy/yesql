@@ -56,7 +56,7 @@ func (s *prepareScanner) scan(ctx context.Context, obj any, query SQLQuery) erro
 				} else {
 					tagVaule = tg[0]
 				}
-				if field.Type.Name() == "Scope" {
+				if field.Type.Name() == "Namespace" {
 					namespace = tagVaule
 					continue
 				}
@@ -75,7 +75,7 @@ func (s *prepareScanner) scan(ctx context.Context, obj any, query SQLQuery) erro
 	for name, value := range fieldValues {
 		qv, exist := qs[name]
 		if !exist {
-			return fmt.Errorf("query '%s' not found in query map", name)
+			return fmt.Errorf("query '%s' not found in query map with namespace: %s", name, namespace)
 		}
 		var v any
 		if ctx == nil {
