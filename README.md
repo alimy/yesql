@@ -86,6 +86,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//go:embed yesql.sql
+var yesqlBytes []byte
+
 var (
 	_db *sqlx.DB
 )
