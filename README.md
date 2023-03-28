@@ -228,7 +228,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/rocboss/paopao-ce/internal/core"
 	"github.com/rocboss/paopao-ce/internal/core/cs"
-	"github.com/sirupsen/logrus"
 )
 
 type topicSrv struct {
@@ -338,14 +337,10 @@ func (s *topicSrv) TagsByKeyword(keyword string) (res cs.TagInfoList, err error)
 func newTopicService(db *sqlx.DB) core.TopicService {
 	initSqlxDB()
 	
-	obj := &topicSrv{
-		sqlxSrv: newSqlxSrv(db),
-	}
 	query := yesql.MustParseBytes(yesqlBytes)
-	if err := yesql.Scan(obj, query); err != nil {
-		logrus.Fatal(err)
-	}
-	return obj
+	return yesqlScan(query, &topicSrv{
+		sqlxSrv: newSqlxSrv(db),
+	})
 }
 ```
 > Source code from [github.com/rocboss/paopao-ce](https://github.com/rocboss/paopao-ce/tree/r/paopao-ce-plus/internal/dao/sakila).
