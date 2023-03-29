@@ -52,7 +52,7 @@ func TestScan(t *testing.T) {
 	}
 	type Q3 struct {
 		SimpleQuery   string `yesql:"simple"`
-		CommentsQuery string `yesql:"comments"`
+		CommentsQuery string `yesql:"$comments"`
 	}
 
 	var (
