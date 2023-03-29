@@ -19,18 +19,16 @@ var (
 	_defaultQueryHooks     []func(query *Query) (*Query, error)
 )
 
-// Use use default prepare scanner with *sql.DB
-func Use(db PrepareContext) {
-	prepareHook := NewPrepareHook(db)
-	scanner := NewPrepareScanner(prepareHook)
-	SetDefaultPrepareScanner(scanner)
+// Use use default prepare scanner with prepare that implement PrepareContext
+func Use(p PrepareContext) {
+	prepareHook := NewPrepareHook(p)
+	_defaultPrepareScanner = NewPrepareScanner(prepareHook)
 }
 
-// UseSqlx use default prepare scanner with *sql.DB
-func UseSqlx(db PreparexContext) {
-	prepareHook := NewSqlxPrepareHook(db)
-	scanner := NewPrepareScanner(prepareHook)
-	SetDefaultPrepareScanner(scanner)
+// UseSqlx use default prepare scanner withprepare that implement PreparexContext
+func UseSqlx(p PreparexContext) {
+	prepareHook := NewSqlxPrepareHook(p)
+	_defaultPrepareScanner = NewPrepareScanner(prepareHook)
 }
 
 // SetDeafultTag set default struct tag
@@ -41,10 +39,10 @@ func SetDefaultTag(tag string) {
 	}
 }
 
-// SetDefaultPrepareScnnner set default prepare scnanner
-func SetDefaultPrepareScanner(scanner PrepareScanner) {
-	if scanner != nil {
-		_defaultPrepareScanner = scanner
+// SetDefaultPrepareHook set default prepare hook
+func SetDefaultPrepareHook(hook PrepareHook) {
+	if hook != nil {
+		_defaultPrepareScanner = NewPrepareScanner(hook)
 	}
 }
 
@@ -111,7 +109,7 @@ func Scan(obj any, query SQLQuery, hook ...PrepareHook) error {
 		scanner = NewPrepareScanner(hook[0])
 	}
 	if scanner == nil {
-		return fmt.Errorf("prepare hook must set or set a default prepare scanner")
+		return fmt.Errorf("prepare hook must set or set a default prepare hook")
 	}
 	return scanner.Scan(obj, query)
 }
@@ -123,7 +121,7 @@ func ScanContext(ctx context.Context, obj any, query SQLQuery, hook ...PrepareHo
 		scanner = NewPrepareScanner(hook[0])
 	}
 	if scanner == nil {
-		return fmt.Errorf("prepare hook must set or set a default prepare scanner")
+		return fmt.Errorf("prepare hook must set or set a default prepare hook")
 	}
 	return scanner.ScanContext(ctx, obj, query)
 }

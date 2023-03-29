@@ -12,11 +12,11 @@ var (
 )
 
 type stdPrepareHook struct {
-	db PrepareContext
+	prepare PrepareContext
 }
 
 type sqlxPrepareHook struct {
-	db PreparexContext
+	prepare PreparexContext
 }
 
 func (s *stdPrepareHook) Prepare(field reflect.Type, query string) (any, error) {
@@ -26,7 +26,7 @@ func (s *stdPrepareHook) Prepare(field reflect.Type, query string) (any, error) 
 		return query, nil
 	case "*sql.Stmt":
 		// Prepared query.
-		stmt, err := s.db.PrepareContext(context.Background(), query)
+		stmt, err := s.prepare.PrepareContext(context.Background(), query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
@@ -43,7 +43,7 @@ func (s *stdPrepareHook) PrepareContext(ctx context.Context, field reflect.Type,
 		return query, nil
 	case "*sql.Stmt":
 		// Prepared query.
-		stmt, err := s.db.PrepareContext(ctx, query)
+		stmt, err := s.prepare.PrepareContext(ctx, query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
@@ -60,14 +60,14 @@ func (s *sqlxPrepareHook) Prepare(field reflect.Type, query string) (any, error)
 		return query, nil
 	case "*sqlx.Stmt":
 		// Prepared query.
-		stmt, err := s.db.PreparexContext(context.Background(), query)
+		stmt, err := s.prepare.PreparexContext(context.Background(), query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
 		return stmt, nil
 	case "*sqlx.NamedStmt":
 		// Prepared query.
-		stmt, err := s.db.PrepareNamedContext(context.Background(), query)
+		stmt, err := s.prepare.PrepareNamedContext(context.Background(), query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
@@ -84,14 +84,14 @@ func (s *sqlxPrepareHook) PrepareContext(ctx context.Context, field reflect.Type
 		return query, nil
 	case "*sqlx.Stmt":
 		// Prepared query.
-		stmt, err := s.db.PreparexContext(ctx, query)
+		stmt, err := s.prepare.PreparexContext(ctx, query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
 		return stmt, nil
 	case "*sqlx.NamedStmt":
 		// Prepared query.
-		stmt, err := s.db.PrepareNamedContext(ctx, query)
+		stmt, err := s.prepare.PrepareNamedContext(ctx, query)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing query '%s': %v", query, err)
 		}
@@ -101,16 +101,16 @@ func (s *sqlxPrepareHook) PrepareContext(ctx context.Context, field reflect.Type
 	}
 }
 
-// NewPrepareHook create a prepare hook with *sql.DB
-func NewPrepareHook(db PrepareContext) PrepareHook {
+// NewPrepareHook create a prepare hook with prepare that implement PrepareContext
+func NewPrepareHook(p PrepareContext) PrepareHook {
 	return &stdPrepareHook{
-		db: db,
+		prepare: p,
 	}
 }
 
-// NewSqlxPrepareHook create a prepare hook with *sqlx.DB
-func NewSqlxPrepareHook(db PreparexContext) PrepareHook {
+// NewSqlxPrepareHook create a prepare hook prepare that implement PreparexContext
+func NewSqlxPrepareHook(p PreparexContext) PrepareHook {
 	return &sqlxPrepareHook{
-		db: db,
+		prepare: p,
 	}
 }
