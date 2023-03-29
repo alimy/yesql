@@ -2,7 +2,7 @@
 -- raw: 1
 SELECT * FROM simple;
 
--- name: multiline
+-- name: multiline@namespace
 SELECT *
 FROM multiline
 WHERE line = 42;

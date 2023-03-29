@@ -23,7 +23,10 @@ type QueryMap map[string]*Query
 // SQLQuery sql query information interface
 type SQLQuery interface {
 	AddHooks(hooks ...func(query *Query) (*Query, error))
-	ListQuery(namespace string) (QueryMap, error)
+
+	// ListQuery get QuryMap by namespace
+	// get default QueryMap if namespace is not give or an empty name
+	ListQuery(namespace ...string) (QueryMap, error)
 }
 
 // PrepareScanner scan object interface

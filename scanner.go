@@ -33,7 +33,7 @@ func (s *prepareScanner) ScanContext(ctx context.Context, obj any, query SQLQuer
 	if ob.Kind() != reflect.Struct {
 		return fmt.Errorf("Failed to apply SQL statements to struct. Non struct type: %T", ob)
 	}
-	// Go through every field in the struct and look for it in the Args map.
+	// go through every field in the struct and look for it in the Args map.
 	var namespace string
 	fieldValues := make(map[string]reflect.Value, ob.NumField())
 	for i := 0; i < ob.NumField(); i++ {
@@ -64,14 +64,24 @@ func (s *prepareScanner) ScanContext(ctx context.Context, obj any, query SQLQuer
 			}
 		}
 	}
-	qs, err := query.ListQuery(namespace)
+	// prepare query process logic
+	var (
+		qs QueryMap
+		ns string
+	)
+	defQuery, _ := query.ListQuery()
+	nsQuery, err := query.ListQuery(namespace)
 	if err != nil {
 		return err
 	}
 	for name, value := range fieldValues {
+		qs, ns = nsQuery, namespace
+		if strings.HasPrefix(name, "$") {
+			qs, ns, name = defQuery, "", strings.TrimLeft(name, "$")
+		}
 		qv, exist := qs[name]
 		if !exist {
-			return fmt.Errorf("query '%s' not found in query map with namespace: %s", name, namespace)
+			return fmt.Errorf("query '%s' not found in query map with namespace: %s", name, ns)
 		}
 		var v any
 		if ctx == nil {

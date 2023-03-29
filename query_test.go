@@ -21,30 +21,46 @@ func TestScannerValid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedQueries := QueryMap{
-		"simple":    &Query{Query: "SELECT * FROM simple;"},
+	expectedDefQueries := QueryMap{
+		"simple":   &Query{Query: "SELECT * FROM simple;"},
+		"comments": &Query{Query: "SELECT * FROM comments;"},
+	}
+	expectedNsQueries := QueryMap{
 		"multiline": &Query{Query: "SELECT * FROM multiline WHERE line = 42;"},
-		"comments":  &Query{Query: "SELECT * FROM comments;"},
 	}
 
-	queries, _ := sqlQuery.ListQuery("")
-	if len(queries) != len(expectedQueries) {
+	queries, _ := sqlQuery.ListQuery()
+	if len(queries) != len(expectedDefQueries) {
 		t.Errorf(
 			"%s should return %d requests, got %d",
-			file, len(expectedQueries), len(queries),
+			file, len(expectedDefQueries), len(queries),
 		)
 	}
-
 	if len(queries["simple"].Tags) != 1 ||
 		queries["simple"].Tags["raw"] != "1" {
 		t.Errorf("Tag 'raw = 1' not found in 'simple' valid query")
 	}
-
-	for key, expectedQuery := range expectedQueries {
+	for key, expectedQuery := range expectedDefQueries {
 		if queries[key].Query != expectedQuery.Query {
 			t.Errorf(
 				"%s query should be '%s', got '%s'",
 				key, expectedQuery, queries[key],
+			)
+		}
+	}
+
+	nsQueries, _ := sqlQuery.ListQuery("namespace")
+	if len(nsQueries) != len(expectedNsQueries) {
+		t.Errorf(
+			"%s should return %d requests, got %d",
+			file, len(expectedNsQueries), len(nsQueries),
+		)
+	}
+	for key, expectedNsQuery := range expectedNsQueries {
+		if nsQueries[key].Query != expectedNsQuery.Query {
+			t.Errorf(
+				"%s query should be '%s', got '%s'",
+				key, expectedNsQuery, queries[key],
 			)
 		}
 	}

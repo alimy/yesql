@@ -30,14 +30,18 @@ func (s *sqlQuery) AddHooks(hooks ...func(query *Query) (*Query, error)) {
 	}
 }
 
-func (s *sqlQuery) ListQuery(namespace string) (QueryMap, error) {
+func (s *sqlQuery) ListQuery(namespace ...string) (QueryMap, error) {
 	if len(namespace) == 0 {
 		return s.defaultQueryMap, nil
 	}
-	if qm, exist := s.nsQueryMap[namespace]; exist {
+	ns := namespace[0]
+	if len(ns) == 0 {
+		return s.defaultQueryMap, nil
+	}
+	if qm, exist := s.nsQueryMap[ns]; exist {
 		return qm, nil
 	}
-	return nil, fmt.Errorf("no exist query list for namespace: %s", namespace)
+	return nil, fmt.Errorf("no exist query list for namespace: %s", ns)
 }
 
 // parseReader takes an io.Reader and returns Queries or an error.
