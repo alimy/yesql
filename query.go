@@ -99,6 +99,8 @@ func (s *sqlQuery) parseReader(reader io.Reader) error {
 				} else {
 					nameTag = tagSlice[0]
 				}
+				// trim special '$' in start
+				nameTag = strings.TrimLeft(nameTag, "$")
 
 				if _, ok := queries[nameTag]; ok {
 					return fmt.Errorf("Duplicate tag %s = %s ", line.Tag, line.Value)

@@ -8,7 +8,7 @@ FROM multiline
 WHERE line = 42;
 
 
--- name: comments
+-- name: $comments
 -- yoyo
 
 SELECT *

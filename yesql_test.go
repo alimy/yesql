@@ -51,8 +51,8 @@ func TestScan(t *testing.T) {
 		RawQuery string `yesql:"does-not-exist"`
 	}
 	type Q3 struct {
-		SimpleQuery   string `yesql:"simple"`
-		CommentsQuery string `yesql:"$comments"`
+		SimpleQuery   string `yesql:"$simple"`
+		CommentsQuery string `yesql:"comments"`
 	}
 
 	var (
