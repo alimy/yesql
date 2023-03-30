@@ -15,6 +15,7 @@ import (
 
 var (
 	_structTag             = "yesql"
+	_defaultGenerator      = NewSqlxGenerator()
 	_defaultPrepareScanner PrepareScanner
 	_defaultQueryHooks     []func(query *Query) (*Query, error)
 )
@@ -55,6 +56,14 @@ func SetDefaultQueryHook(hooks ...func(query *Query) (*Query, error)) {
 		if hook != nil {
 			_defaultQueryHooks = append(_defaultQueryHooks, hook)
 		}
+	}
+}
+
+// SetDefaultGenerator set default generator
+// The default generator is NewSqlxGenerator() instance in first start
+func SetDefaultGenerator(g Generator) {
+	if g != nil {
+		_defaultGenerator = g
 	}
 }
 
@@ -121,11 +130,11 @@ func ScanContext(ctx context.Context, obj any, query SQLQuery, hook ...PrepareHo
 	return scanner.ScanContext(ctx, obj, query)
 }
 
-// Generate generate struct type autumatic by sql file
-func Generate(g Generator, sqlFilePath string, dstPath string, pkgName string, opts ...option) error {
+// Generate generate struct type autumatic by sql file with default generator
+func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option) error {
 	query, err := ParseFile(sqlFilePath)
 	if err != nil {
 		return err
 	}
-	return g.Generate(dstPath, pkgName, query, opts...)
+	return _defaultGenerator.Generate(dstPath, pkgName, query, opts...)
 }

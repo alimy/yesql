@@ -1,9 +1,9 @@
 package yesql
 
 import (
-	stdTmpl "html/template"
 	"os"
 	"path/filepath"
+	stdTmpl "text/template"
 
 	"github.com/alimy/yesql/naming"
 	"github.com/alimy/yesql/template"
@@ -70,18 +70,14 @@ func (s *sqlGenerator) Generate(dstPath string, pkgName string, query SQLQuery, 
 	return s.tmpl.Execute(file, data)
 }
 
-func NewSqlGenerator() (Generator, error) {
-	tmpl, err := template.NewSqlTemplate()
-	if err != nil {
-		return nil, err
+func NewSqlGenerator() Generator {
+	return &sqlGenerator{
+		tmpl: template.NewSqlTemplate(),
 	}
-	return &sqlGenerator{tmpl: tmpl}, nil
 }
 
-func NewSqlxGenerator() (Generator, error) {
-	tmpl, err := template.NewSqlxTemplate()
-	if err != nil {
-		return nil, err
+func NewSqlxGenerator() Generator {
+	return &sqlGenerator{
+		tmpl: template.NewSqlxTemplate(),
 	}
-	return &sqlGenerator{tmpl: tmpl}, nil
 }

@@ -12,7 +12,7 @@ import (
 )
 
 const (
-    {{range .AllQuery }}_{{ naming .Name }}{{if notEmptyStr .Scope}}_{{ naming .Scope}}{{end}} = `{{ .Query }}`
+    {{range .AllQuery }}_{{ naming .Name }}{{if notEmptyStr .Scope}}_{{ naming .Scope}}{{end}} =  `{{ escape .Query }}`
     {{end -}}
 )
 
