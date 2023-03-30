@@ -1,6 +1,7 @@
 package yesql
 
 import (
+	"context"
 	"testing"
 )
 
@@ -26,7 +27,7 @@ func TestPrepareScan(t *testing.T) {
 	)
 	queries := MustParseFile("testdata/valid.sql")
 	scanner := NewPrepareScanner(NewPrepareHook(nil))
-	err := scanner.Scan(&q, queries)
+	err := scanner.ScanContext(context.Background(), &q, queries)
 	if err != nil {
 		t.Errorf("[q] failed to scan raw query to struct: %s", err)
 	}
@@ -37,11 +38,11 @@ func TestPrepareScan(t *testing.T) {
 		t.Errorf("[q] want raw query but got %s", q.RawQuery)
 	}
 
-	if err = scanner.Scan(&q2, queries); err == nil {
+	if err = scanner.ScanContext(context.Background(), &q2, queries); err == nil {
 		t.Error("[q2] expected to fail at non-existent query 'does-not-exist' but didn't")
 	}
 
-	if err = scanner.Scan(&q3, queries); err != nil {
+	if err = scanner.ScanContext(context.Background(), &q3, queries); err != nil {
 		t.Errorf("[q3] failed to scan raw query to struct: %s", err)
 	}
 	if q3.SimpleQuery != `SELECT * FROM simple;` {

@@ -21,10 +21,6 @@ func (s *prepareScanner) SetPrepareHook(hook PrepareHook) {
 	}
 }
 
-func (s *prepareScanner) Scan(obj any, query SQLQuery) error {
-	return s.ScanContext(context.Background(), obj, query)
-}
-
 func (s *prepareScanner) ScanContext(ctx context.Context, obj any, query SQLQuery) error {
 	ob := reflect.ValueOf(obj)
 	if ob.Kind() == reflect.Ptr {
@@ -83,11 +79,7 @@ func (s *prepareScanner) ScanContext(ctx context.Context, obj any, query SQLQuer
 			return fmt.Errorf("query '%s' not found in query map with namespace: %s", name, ns)
 		}
 		var v any
-		if ctx == nil {
-			v, err = s.prepareHook.PrepareContext(context.Background(), value.Type(), qv.Query)
-		} else {
-			v, err = s.prepareHook.PrepareContext(ctx, value.Type(), qv.Query)
-		}
+		v, err = s.prepareHook.PrepareContext(ctx, value.Type(), qv.Query)
 		if err != nil {
 			return err
 		}

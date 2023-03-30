@@ -15,6 +15,7 @@ import (
 
 var (
 	_structTag             = "yesql"
+	_defaultNamingStrategy = NewFieldUpNamingStrategy()
 	_defaultPrepareScanner PrepareScanner
 	_defaultQueryHooks     []func(query *Query) (*Query, error)
 )
@@ -55,6 +56,12 @@ func SetDefaultQueryHook(hooks ...func(query *Query) (*Query, error)) {
 		if hook != nil {
 			_defaultQueryHooks = append(_defaultQueryHooks, hook)
 		}
+	}
+}
+
+func SetNamingStrategy(ns NamingStrategy) {
+	if ns != nil {
+		_defaultNamingStrategy = ns
 	}
 }
 
@@ -106,14 +113,7 @@ func ParseReader(reader io.Reader, hooks ...func(query *Query) (*Query, error)) 
 
 // Scan scan object from a SQLQuery
 func Scan(obj any, query SQLQuery, hook ...PrepareHook) error {
-	scanner := _defaultPrepareScanner
-	if len(hook) > 0 && hook[0] != nil {
-		scanner = NewPrepareScanner(hook[0])
-	}
-	if scanner == nil {
-		return fmt.Errorf("prepare hook must set or set a default prepare hook")
-	}
-	return scanner.Scan(obj, query)
+	return ScanContext(context.Background(), obj, query, hook...)
 }
 
 // ScanContext scan object from a SQLQuery with context.Context
@@ -126,4 +126,13 @@ func ScanContext(ctx context.Context, obj any, query SQLQuery, hook ...PrepareHo
 		return fmt.Errorf("prepare hook must set or set a default prepare hook")
 	}
 	return scanner.ScanContext(ctx, obj, query)
+}
+
+// Generate generate struct type autumatic by sql file
+func Generate(g Generator, sqlFilePath string, dstPath string, pkgName string, opts ...option) error {
+	query, err := ParseFile(sqlFilePath)
+	if err != nil {
+		return err
+	}
+	return g.Generate(dstPath, pkgName, query, opts...)
 }

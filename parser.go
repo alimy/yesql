@@ -9,6 +9,9 @@ import (
 	"strings"
 )
 
+// default tag name of sql clause in sql file
+const tagName = "name"
+
 // A line may be blank, a tag, a comment or a query
 const (
 	lineBlank = iota
@@ -16,9 +19,6 @@ const (
 	lineComment
 	lineTag
 )
-
-// default tag name of sql clause in sql file
-const tagName = "name"
 
 var (
 	// -- tag: $value
@@ -32,7 +32,6 @@ var (
 )
 
 // ParsedLine stores line type and value
-//
 // For example: parsedLine{Type=lineTag, Value="foo"}
 type parsedLine struct {
 	Type  int
@@ -41,9 +40,9 @@ type parsedLine struct {
 }
 
 type sqlParser struct {
-	hooks           []func(query *Query) (*Query, error)
-	defaultQueryMap QueryMap
-	nsQueryMap      map[string]QueryMap
+	hooks      []func(query *Query) (*Query, error)
+	queryMap   QueryMap
+	scopeQuery ScopeQuery
 }
 
 func (s *sqlParser) AddHooks(hooks ...func(query *Query) (*Query, error)) {
@@ -56,24 +55,41 @@ func (s *sqlParser) AddHooks(hooks ...func(query *Query) (*Query, error)) {
 
 func (s *sqlParser) ListQuery(namespace ...string) (QueryMap, error) {
 	if len(namespace) == 0 {
-		return s.defaultQueryMap, nil
+		return s.queryMap, nil
 	}
 	ns := namespace[0]
 	if len(ns) == 0 {
-		return s.defaultQueryMap, nil
+		return s.queryMap, nil
 	}
-	if qm, exist := s.nsQueryMap[ns]; exist {
+	if qm, exist := s.scopeQuery[ns]; exist {
 		return qm, nil
 	}
 	return nil, fmt.Errorf("no exist query list for namespace: %s", ns)
 }
 
+func (s *sqlParser) ListScope() ScopeQuery {
+	return s.scopeQuery
+}
+
+func (s *sqlParser) AllQuery() []*Query {
+	allQuery := make([]*Query, 0, len(s.queryMap))
+	for _, query := range s.queryMap {
+		allQuery = append(allQuery, query)
+	}
+	for _, qm := range s.scopeQuery {
+		for _, query := range qm {
+			allQuery = append(allQuery, query)
+		}
+	}
+	return allQuery
+}
+
 func (s *sqlParser) SqlQuery(namespace string) (QueryMap, QueryMap, error) {
 	if len(namespace) == 0 {
-		return s.defaultQueryMap, s.defaultQueryMap, nil
+		return s.queryMap, s.queryMap, nil
 	}
-	if nsQuery, exist := s.nsQueryMap[namespace]; exist {
-		return s.defaultQueryMap, nsQuery, nil
+	if nsQuery, exist := s.scopeQuery[namespace]; exist {
+		return s.queryMap, nsQuery, nil
 	}
 	return nil, nil, fmt.Errorf("no exist query list for namespace: %s", namespace)
 }
@@ -102,9 +118,9 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 			}
 
 			q := line.Value
-			query := s.defaultQueryMap[nameTag]
+			query := s.queryMap[nameTag]
 			if len(namespace) > 0 {
-				query = s.nsQueryMap[namespace][nameTag]
+				query = s.scopeQuery[namespace][nameTag]
 			}
 
 			// If query is multiline.
@@ -120,15 +136,15 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 				namespace = ""
 				queryLine = ""
 				tagSlice := strings.Split(line.Value, "@")
-				queries := s.defaultQueryMap
+				queries := s.queryMap
 				if len(tagSlice) > 1 {
 					nameTag = tagSlice[0]
 					if len(tagSlice[1]) > 0 {
 						namespace = tagSlice[1]
-						if _, exist := s.nsQueryMap[namespace]; !exist {
-							s.nsQueryMap[namespace] = make(QueryMap)
+						if _, exist := s.scopeQuery[namespace]; !exist {
+							s.scopeQuery[namespace] = make(QueryMap)
 						}
-						queries = s.nsQueryMap[namespace]
+						queries = s.scopeQuery[namespace]
 					}
 				} else {
 					nameTag = tagSlice[0]
@@ -140,11 +156,14 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 					return nil, fmt.Errorf("Duplicate tag %s = %s ", line.Tag, line.Value)
 				}
 
-				newQuery := &Query{Tags: make(map[string]string)}
+				newQuery := &Query{
+					Scope: namespace,
+					Tags:  make(map[string]string),
+				}
 				if len(namespace) > 0 {
-					s.nsQueryMap[namespace][nameTag] = newQuery
+					s.scopeQuery[namespace][nameTag] = newQuery
 				} else {
-					s.defaultQueryMap[nameTag] = newQuery
+					s.queryMap[nameTag] = newQuery
 				}
 			} else {
 				// Is there a name tag for this query?
@@ -152,9 +171,9 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 					return nil, errors.New("'name' should be the first tag")
 				}
 
-				queries := s.defaultQueryMap
+				queries := s.queryMap
 				if len(namespace) > 0 {
-					queries = s.nsQueryMap[namespace]
+					queries = s.scopeQuery[namespace]
 				}
 
 				// Has this tag already been used on this query?
@@ -163,9 +182,9 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 				}
 
 				if len(namespace) > 0 {
-					s.nsQueryMap[namespace][nameTag].Tags[line.Tag] = line.Value
+					s.scopeQuery[namespace][nameTag].Tags[line.Tag] = line.Value
 				} else {
-					s.defaultQueryMap[nameTag].Tags[line.Tag] = line.Value
+					s.queryMap[nameTag].Tags[line.Tag] = line.Value
 				}
 			}
 		}
@@ -185,12 +204,12 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 }
 
 func (s *sqlParser) checkQuery() error {
-	for name, q := range s.defaultQueryMap {
+	for name, q := range s.queryMap {
 		if q.Query == "" {
 			return fmt.Errorf("'%s' is missing query", name)
 		}
 	}
-	for ns, qs := range s.nsQueryMap {
+	for ns, qs := range s.scopeQuery {
 		for name, q := range qs {
 			if q.Query == "" {
 				return fmt.Errorf("'%s@%s' is missing query", name, ns)
@@ -201,22 +220,22 @@ func (s *sqlParser) checkQuery() error {
 }
 
 func (s *sqlParser) runHooks() (err error) {
-	for name, query := range s.defaultQueryMap {
+	for name, query := range s.queryMap {
 		for _, hook := range s.hooks {
 			if query, err = hook(query); err != nil {
 				return fmt.Errorf("run hook failue name: %s err: %w", name, err)
 			}
 		}
-		s.defaultQueryMap[name] = query
+		s.queryMap[name] = query
 	}
-	for ns, qs := range s.nsQueryMap {
+	for ns, qs := range s.scopeQuery {
 		for name, query := range qs {
 			for _, hook := range s.hooks {
 				if query, err = hook(query); err != nil {
 					return fmt.Errorf("run hook failue name: %s@%s err: %w", name, ns, err)
 				}
 			}
-			s.nsQueryMap[ns][name] = query
+			s.scopeQuery[ns][name] = query
 		}
 	}
 	return
@@ -238,8 +257,8 @@ func parseLine(line string) parsedLine {
 
 func newSQLParser(hooks ...func(query *Query) (*Query, error)) SQLParser {
 	obj := &sqlParser{
-		defaultQueryMap: make(QueryMap),
-		nsQueryMap:      make(map[string]QueryMap),
+		queryMap:   make(QueryMap),
+		scopeQuery: make(ScopeQuery),
 	}
 	obj.hooks = append(obj.hooks, hooks...)
 	return obj
