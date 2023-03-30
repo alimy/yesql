@@ -15,7 +15,6 @@ import (
 
 var (
 	_structTag             = "yesql"
-	_defaultNamingStrategy = NewFieldUpNamingStrategy()
 	_defaultPrepareScanner PrepareScanner
 	_defaultQueryHooks     []func(query *Query) (*Query, error)
 )
@@ -56,12 +55,6 @@ func SetDefaultQueryHook(hooks ...func(query *Query) (*Query, error)) {
 		if hook != nil {
 			_defaultQueryHooks = append(_defaultQueryHooks, hook)
 		}
-	}
-}
-
-func SetNamingStrategy(ns NamingStrategy) {
-	if ns != nil {
-		_defaultNamingStrategy = ns
 	}
 }
 

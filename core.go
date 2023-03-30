@@ -17,11 +17,6 @@ const (
 	PrepareStyleUnknow    = "unknow"
 )
 
-// NamingStrategy naming strategy interface
-type NamingStrategy interface {
-	FiledNaming(string) string
-}
-
 // Namespace just a placeholder type for indicate namespace of object
 type Namespace struct{}
 
@@ -37,6 +32,7 @@ type option interface {
 // Query is a parsed query along with tags.
 type Query struct {
 	Scope string
+	Name  string
 	Query string
 	Tags  map[string]string
 }
@@ -46,10 +42,10 @@ func (q *Query) PrepareStyle() string {
 	if style, exist := q.Tags["prepare"]; exist {
 		style = strings.ToLower(strings.Trim(style, " "))
 		switch style {
-		case PrepareStyleStmt, PrepareStyleNamedStmt, PrepareStyleRaw, "string":
+		case PrepareStyleStmt, PrepareStyleNamedStmt, PrepareStyleRaw:
 			prepareStyle = style
 		default:
-			prepareStyle = PrepareStyleUnknow
+			prepareStyle = PrepareStyleRaw
 		}
 	}
 	return prepareStyle
@@ -66,6 +62,19 @@ func (q QueryMap) FilterByStyle(style string) QueryMap {
 		}
 	}
 	return qm
+}
+
+func (q QueryMap) IsNotEmpty() bool {
+	return len(q) > 0
+}
+
+func (q QueryMap) IsRawQueryNotEmpty() bool {
+	for _, query := range q {
+		if query.PrepareStyle() == PrepareStyleRaw {
+			return true
+		}
+	}
+	return false
 }
 
 // ScopeQuery is a namespace QueryMap

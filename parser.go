@@ -158,6 +158,7 @@ func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 
 				newQuery := &Query{
 					Scope: namespace,
+					Name:  nameTag,
 					Tags:  make(map[string]string),
 				}
 				if len(namespace) > 0 {

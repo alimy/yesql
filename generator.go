@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/alimy/yesql/naming"
 	"github.com/alimy/yesql/template"
 )
 
@@ -15,6 +16,7 @@ var (
 type tmplCtx struct {
 	PkgName           string
 	DefaultStructName string
+	AllQuery          []*Query
 	DefaultQueryMap   QueryMap
 	ScopeQuery        ScopeQuery
 	YesqlVer          string
@@ -22,6 +24,10 @@ type tmplCtx struct {
 
 type sqlGenerator struct {
 	tmpl *stdTmpl.Template
+}
+
+func (t *tmplCtx) DefaultQueryMapNotEmpty() bool {
+	return len(t.DefaultQueryMap) != 0
 }
 
 func (s *sqlGenerator) Generate(dstPath string, pkgName string, query SQLQuery, opts ...option) (err error) {
@@ -34,7 +40,8 @@ func (s *sqlGenerator) Generate(dstPath string, pkgName string, query SQLQuery, 
 	}
 	data := &tmplCtx{
 		PkgName:           pkgName,
-		DefaultStructName: _defaultNamingStrategy.FiledNaming(opt.defaultStructName),
+		DefaultStructName: naming.Naming(opt.defaultStructName),
+		AllQuery:          query.AllQuery(),
 		ScopeQuery:        query.ListScope(),
 		YesqlVer:          Version,
 	}

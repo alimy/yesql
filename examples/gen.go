@@ -9,12 +9,12 @@ import (
 //go:generate go run $GOFILE
 func main() {
 	log.Println("Yesql generate code start")
-	g, err := yesql.NewSqlxGenerator()
+	g, err := yesql.NewSqlGenerator()
 	if err != nil {
 		log.Fatalf("create a sqlx generator error: %s", err)
 	}
-	yesql.Generate(g, "yesql.sql", "auto", "yesql",
-		yesql.DefaultStructNameOpt("Yesql"),
-		yesql.GoFileNameOpt("yesql.go"))
+	if err := yesql.Generate(g, "yesql.sql", "auto", "yesql"); err != nil {
+		log.Fatalf("generate code occurs error: %s", err)
+	}
 	log.Println("Yesql generate code finish")
 }

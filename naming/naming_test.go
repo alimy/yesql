@@ -1,4 +1,4 @@
-package yesql
+package naming
 
 import "testing"
 
@@ -12,7 +12,7 @@ func TestFieldUp(t *testing.T) {
 		"AbC__De_fG_":        "AbCDeFG",
 		"_Abc_De_fG_":        "AbcDeFG",
 	} {
-		if value := ns.FiledNaming(name); value != expect {
+		if value := ns.Naming(name); value != expect {
 			t.Errorf("want %s bug got %s when namming %s", expect, value, name)
 		}
 	}
