@@ -69,8 +69,7 @@ func (s *prepareScanner) ScanContext(ctx context.Context, obj any, query SQLQuer
 		qs QueryMap
 		ns string
 	)
-	defQuery, _ := query.ListQuery()
-	nsQuery, err := query.ListQuery(namespace)
+	defQuery, nsQuery, err := query.SqlQuery(namespace)
 	if err != nil {
 		return err
 	}

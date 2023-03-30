@@ -3,6 +3,7 @@ package yesql
 import (
 	"context"
 	"database/sql"
+	"io"
 	"reflect"
 
 	"github.com/jmoiron/sqlx"
@@ -22,11 +23,13 @@ type QueryMap map[string]*Query
 
 // SQLQuery sql query information interface
 type SQLQuery interface {
-	AddHooks(hooks ...func(query *Query) (*Query, error))
-
 	// ListQuery get QuryMap by namespace
 	// get default QueryMap if namespace is not give or an empty name
 	ListQuery(namespace ...string) (QueryMap, error)
+
+	// SqlQuery get default QueryMap and namespace's QueryMap.
+	// return default QueryMap if namespace is empty string
+	SqlQuery(namespace string) (QueryMap, QueryMap, error)
 }
 
 // PrepareScanner scan object interface
@@ -58,4 +61,12 @@ type PreparexContext interface {
 
 	// PrepareNamedContext returns an sqlx.NamedStmt
 	PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error)
+}
+
+// SQLParser sql file parser interface
+type SQLParser interface {
+	SQLQuery
+
+	AddHooks(hooks ...func(query *Query) (*Query, error))
+	ParseReader(reader io.Reader) error
 }
