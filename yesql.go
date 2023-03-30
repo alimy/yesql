@@ -40,7 +40,9 @@ func SetDefaultTag(tag string) {
 }
 
 // SetDefaultPrepareHook set default prepare hook
+// Reset default prepare hook if hook is nil
 func SetDefaultPrepareHook(hook PrepareHook) {
+	_defaultPrepareScanner = nil
 	if hook != nil {
 		_defaultPrepareScanner = NewPrepareScanner(hook)
 	}
