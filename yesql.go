@@ -46,8 +46,8 @@ func SetDefaultPrepareHook(hook PrepareHook) {
 	}
 }
 
-// SetDefaultQueryHooks set default query hooks
-func SetDefaultQueryHooks(hooks ...func(query *Query) (*Query, error)) {
+// SetDefaultQueryHook set default query hooks
+func SetDefaultQueryHook(hooks ...func(query *Query) (*Query, error)) {
 	_defaultQueryHooks = nil
 	for _, hook := range hooks {
 		if hook != nil {
