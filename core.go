@@ -136,6 +136,18 @@ type PreparexContext interface {
 	Rebind(query string) string
 }
 
+// PrepareBuilder prepare builder interface sql
+type PrepareBuilder interface {
+	PrepareContext
+	QueryHook(query string) string
+}
+
+// PreparexBuilder preparex builder interface for sqlx
+type PreparexBuilder interface {
+	PreparexContext
+	QueryHook(query string) string
+}
+
 // Generator generate struct code automatic base SQLQuery
 type Generator interface {
 	Generate(dstPath string, pkgName string, query SQLQuery, opts ...option) error

@@ -1,3 +1,3 @@
 package yesql
 
-var Version = "v1.0.0"
+var Version = "v1.1.0"

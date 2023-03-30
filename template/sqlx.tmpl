@@ -37,43 +37,43 @@ type {{ naming $scope }} struct {
 {{end -}}
 
 {{if .DefaultQueryMapNotEmpty}}
-func Build{{ .DefaultStructName }}(p yesql.PreparexContext, ctx ...context.Context) (obj *{{ .DefaultStructName }}, err error) {
+func Build{{ .DefaultStructName }}(p yesql.PreparexBuilder, ctx ...context.Context) (obj *{{ .DefaultStructName }}, err error) {
 	var c context.Context
-	if len(ctx) > 0 && ctx[0] == nil {
+	if len(ctx) > 0 && ctx[0] != nil {
 		c = ctx[0]
 	} else {
 		c = context.Background()
 	}
 	obj = &{{ .DefaultStructName }}{{if .DefaultQueryMap.IsRawQueryNotEmpty }}{
-        {{range $name, $_ := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}:    _{{ naming $name}},
+        {{range $name, $_ := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}),
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "stmt" }}
-    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(_{{ naming $name }})); err != nil {
+    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}))); err != nil {
 		return
 	}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "named_stmt" }}
-    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(_{{ naming $name }})); err != nil {
+    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}))); err != nil {
 		return
 	}{{end}}
 	return
 }{{end}}
 {{range $scope, $queryMap := .ScopeQuery }}
-func Build{{ naming $scope }}(p yesql.PreparexContext, ctx ...context.Context) (obj *{{ naming $scope }}, err error) {
+func Build{{ naming $scope }}(p yesql.PreparexBuilder, ctx ...context.Context) (obj *{{ naming $scope }}, err error) {
     var c context.Context
-	if len(ctx) > 0 && ctx[0] == nil {
+	if len(ctx) > 0 && ctx[0] != nil {
 		c = ctx[0]
 	} else {
 		c = context.Background()
 	}
 	obj = &{{naming $scope }}{{if $queryMap.IsRawQueryNotEmpty }}{
-        {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    _{{ naming $name}}_{{ naming $scope }},
+        {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}_{{ naming $scope }}),
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "stmt" }}
-    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(_{{ naming $name }}_{{ naming $scope }})); err != nil {
+    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}_{{ naming $scope }}))); err != nil {
 		return
 	}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "named_stmt" }}
-    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(_{{ naming $name }}_{{ naming $scope }})); err != nil {
+    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}_{{ naming $scope }}))); err != nil {
 		return
 	}{{end}}
     return
