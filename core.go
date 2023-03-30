@@ -131,6 +131,9 @@ type PreparexContext interface {
 
 	// PrepareNamedContext returns an sqlx.NamedStmt
 	PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error)
+
+	// Rebind rebind query to adapte SQL Driver
+	Rebind(query string) string
 }
 
 // Generator generate struct code automatic base SQLQuery

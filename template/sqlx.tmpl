@@ -48,11 +48,11 @@ func Build{{ .DefaultStructName }}(p yesql.PreparexContext, ctx ...context.Conte
         {{range $name, $_ := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}:    _{{ naming $name}},
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "stmt" }}
-    if obj.{{ naming $name }}, err = p.PreparexContext(c, _{{ naming $name }}); err != nil {
+    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(_{{ naming $name }})); err != nil {
 		return
 	}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "named_stmt" }}
-    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, _{{ naming $name }}); err != nil {
+    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(_{{ naming $name }})); err != nil {
 		return
 	}{{end}}
 	return
@@ -69,11 +69,11 @@ func Build{{ naming $scope }}(p yesql.PreparexContext, ctx ...context.Context) (
         {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    _{{ naming $name}}_{{ naming $scope }},
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "stmt" }}
-    if obj.{{ naming $name }}, err = p.PreparexContext(c, _{{ naming $name }}_{{ naming $scope }}); err != nil {
+    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(_{{ naming $name }}_{{ naming $scope }})); err != nil {
 		return
 	}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "named_stmt" }}
-    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, _{{ naming $name }}_{{ naming $scope }}); err != nil {
+    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(_{{ naming $name }}_{{ naming $scope }})); err != nil {
 		return
 	}{{end}}
     return

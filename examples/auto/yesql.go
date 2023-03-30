@@ -12,45 +12,45 @@ import (
 )
 
 const (
-	_LoginInfoE              = `SELECT * FROM @user WHERE username=?`
-	_UserInfoD               = `SELECT "username", "nickname" FROM @user WHERE username=?`
-	_LoginInfoD              = `SELECT * FROM @user WHERE username=?`
-	_UserInfoC               = `SELECT "username" FROM @user WHERE username=?`
-	_LoginInfoA              = `SELECT * FROM @user WHERE username=?`
 	_LoginInfoB              = `SELECT * FROM @user WHERE username=?`
 	_LogoutInfoC             = `SELECT * FROM @user WHERE username=?`
-	_UserInfoA               = `SELECT ` + "`" + `username` + "`" + ` FROM @user WHERE username=?`
+	_LoginInfoD              = `SELECT * FROM @user WHERE username=?`
+	_LoginInfoE              = `SELECT * FROM @user WHERE username=?`
 	_UserInfoB               = `SELECT ` + "`" + `username` + "`" + `, ` + "`" + `nickname` + "`" + ` FROM @user WHERE username=?`
-	_TagsByKeywordB_Topic    = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORDER BY quote_num DESC LIMIT 6;`
-	_InsertTag_Topic         = `INSERT INTO @tag (user_id, tag, created_on, modified_on, quote_num) VALUES (?, ?, ?, ?, 1);`
-	_DecrTagsById_Topic      = `UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);`
-	_TagsForIncr_Topic       = `SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);`
-	_NewestTags_Topic        = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.id DESC LIMIT ? OFFSET ?;`
-	_TagsByKeywordA_Topic    = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 ORDER BY quote_num DESC LIMIT 6;`
-	_TagsByIdA_Topic         = `SELECT id FROM @tag WHERE id IN (?) AND is_del = 0 AND quote_num > 0;`
+	_UserInfoC               = `SELECT "username" FROM @user WHERE username=?`
+	_LoginInfoA              = `SELECT * FROM @user WHERE username=?`
+	_UserInfoA               = `SELECT ` + "`" + `username` + "`" + ` FROM @user WHERE username=?`
+	_UserInfoD               = `SELECT "username", "nickname" FROM @user WHERE username=?`
 	_TagsByIdB_Topic         = `SELECT id, user_id, tag, quote_num FROM @tag WHERE id IN (?);`
+	_TagsForIncr_Topic       = `SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);`
 	_IncrTagsById_Topic      = `UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);`
 	_HotTags_Topic           = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.quote_num DESC LIMIT ? OFFSET ?;`
+	_InsertTag_Topic         = `INSERT INTO @tag (user_id, tag, created_on, modified_on, quote_num) VALUES (?, ?, ?, ?, 1);`
+	_TagsByIdA_Topic         = `SELECT id FROM @tag WHERE id IN (?) AND is_del = 0 AND quote_num > 0;`
+	_DecrTagsById_Topic      = `UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);`
+	_NewestTags_Topic        = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.id DESC LIMIT ? OFFSET ?;`
+	_TagsByKeywordA_Topic    = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 ORDER BY quote_num DESC LIMIT 6;`
+	_TagsByKeywordB_Topic    = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORDER BY quote_num DESC LIMIT 6;`
+	_HotTags_Shutter         = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.quote_num DESC LIMIT ? OFFSET ?;`
 	_TagsByKeywordA_Shutter  = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 ORDER BY quote_num DESC LIMIT 6;`
+	_DecrTagsById_Shutter    = `UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);`
+	_TagsForIncr_Shutter     = `SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);`
+	_IncrTagsById_Shutter    = `UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);`
+	_NewestTags_Shutter      = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.id DESC LIMIT ? OFFSET ?;`
+	_TagsByKeywordB_Shutter  = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORDER BY quote_num DESC LIMIT 6;`
 	_InsertTag_Shutter       = `INSERT INTO @tag (user_id, tag, created_on, modified_on, quote_num) VALUES (?, ?, ?, ?, 1);`
 	_TagsByIdA_Shutter       = `SELECT id FROM @tag WHERE id IN (?) AND is_del = 0 AND quote_num > 0;`
 	_TagsByIdB_Shutter       = `SELECT id, user_id, tag, quote_num FROM @tag WHERE id IN (?);`
-	_DecrTagsById_Shutter    = `UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);`
-	_NewestTags_Shutter      = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.id DESC LIMIT ? OFFSET ?;`
-	_HotTags_Shutter         = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.quote_num DESC LIMIT ? OFFSET ?;`
-	_IncrTagsById_Shutter    = `UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);`
-	_TagsByKeywordB_Shutter  = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORDER BY quote_num DESC LIMIT 6;`
-	_TagsForIncr_Shutter     = `SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);`
 	_IncrTagsById_TagsInfo   = `UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);`
 	_NewestTags_TagsInfo     = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.id DESC LIMIT ? OFFSET ?;`
-	_TagsByKeywordB_TagsInfo = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORDER BY quote_num DESC LIMIT 6;`
-	_TagsForIncr_TagsInfo    = `SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);`
-	_TagsByIdA_TagsInfo      = `SELECT id FROM @tag WHERE id IN (?) AND is_del = 0 AND quote_num > 0;`
-	_TagsByIdB_TagsInfo      = `SELECT id, user_id, tag, quote_num FROM @tag WHERE id IN (?);`
-	_DecrTagsById_TagsInfo   = `UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);`
-	_HotTags_TagsInfo        = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.quote_num DESC LIMIT ? OFFSET ?;`
 	_TagsByKeywordA_TagsInfo = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 ORDER BY quote_num DESC LIMIT 6;`
+	_TagsByKeywordB_TagsInfo = `SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORDER BY quote_num DESC LIMIT 6;`
+	_TagsByIdB_TagsInfo      = `SELECT id, user_id, tag, quote_num FROM @tag WHERE id IN (?);`
+	_TagsForIncr_TagsInfo    = `SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);`
+	_HotTags_TagsInfo        = `SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin FROM @tag t JOIN @user u ON t.user_id = u.id WHERE t.is_del = 0 AND t.quote_num > 0 ORDER BY t.quote_num DESC LIMIT ? OFFSET ?;`
 	_InsertTag_TagsInfo      = `INSERT INTO @tag (user_id, tag, created_on, modified_on, quote_num) VALUES (?, ?, ?, ?, 1);`
+	_TagsByIdA_TagsInfo      = `SELECT id FROM @tag WHERE id IN (?) AND is_del = 0 AND quote_num > 0;`
+	_DecrTagsById_TagsInfo   = `UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);`
 )
 
 type Yesql struct {
@@ -120,19 +120,19 @@ func BuildYesql(p yesql.PreparexContext, ctx ...context.Context) (obj *Yesql, er
 		UserInfoC:   _UserInfoC,
 		UserInfoD:   _UserInfoD,
 	}
-	if obj.LoginInfoB, err = p.PreparexContext(c, _LoginInfoB); err != nil {
+	if obj.LoginInfoB, err = p.PreparexContext(c, p.Rebind(_LoginInfoB)); err != nil {
 		return
 	}
-	if obj.UserInfoA, err = p.PreparexContext(c, _UserInfoA); err != nil {
+	if obj.UserInfoA, err = p.PreparexContext(c, p.Rebind(_UserInfoA)); err != nil {
 		return
 	}
-	if obj.UserInfoB, err = p.PreparexContext(c, _UserInfoB); err != nil {
+	if obj.UserInfoB, err = p.PreparexContext(c, p.Rebind(_UserInfoB)); err != nil {
 		return
 	}
-	if obj.LoginInfoA, err = p.PrepareNamedContext(c, _LoginInfoA); err != nil {
+	if obj.LoginInfoA, err = p.PrepareNamedContext(c, p.Rebind(_LoginInfoA)); err != nil {
 		return
 	}
-	if obj.LoginInfoE, err = p.PrepareNamedContext(c, _LoginInfoE); err != nil {
+	if obj.LoginInfoE, err = p.PrepareNamedContext(c, p.Rebind(_LoginInfoE)); err != nil {
 		return
 	}
 	return
@@ -152,19 +152,19 @@ func BuildShutter(p yesql.PreparexContext, ctx ...context.Context) (obj *Shutter
 		TagsByIdB:    _TagsByIdB_Shutter,
 		TagsForIncr:  _TagsForIncr_Shutter,
 	}
-	if obj.HotTags, err = p.PreparexContext(c, _HotTags_Shutter); err != nil {
+	if obj.HotTags, err = p.PreparexContext(c, p.Rebind(_HotTags_Shutter)); err != nil {
 		return
 	}
-	if obj.TagsByKeywordA, err = p.PreparexContext(c, _TagsByKeywordA_Shutter); err != nil {
+	if obj.TagsByKeywordA, err = p.PreparexContext(c, p.Rebind(_TagsByKeywordA_Shutter)); err != nil {
 		return
 	}
-	if obj.TagsByKeywordB, err = p.PreparexContext(c, _TagsByKeywordB_Shutter); err != nil {
+	if obj.TagsByKeywordB, err = p.PreparexContext(c, p.Rebind(_TagsByKeywordB_Shutter)); err != nil {
 		return
 	}
-	if obj.InsertTag, err = p.PrepareNamedContext(c, _InsertTag_Shutter); err != nil {
+	if obj.InsertTag, err = p.PrepareNamedContext(c, p.Rebind(_InsertTag_Shutter)); err != nil {
 		return
 	}
-	if obj.NewestTags, err = p.PrepareNamedContext(c, _NewestTags_Shutter); err != nil {
+	if obj.NewestTags, err = p.PrepareNamedContext(c, p.Rebind(_NewestTags_Shutter)); err != nil {
 		return
 	}
 	return
@@ -184,19 +184,19 @@ func BuildTagsInfo(p yesql.PreparexContext, ctx ...context.Context) (obj *TagsIn
 		TagsByIdB:    _TagsByIdB_TagsInfo,
 		TagsForIncr:  _TagsForIncr_TagsInfo,
 	}
-	if obj.HotTags, err = p.PreparexContext(c, _HotTags_TagsInfo); err != nil {
+	if obj.HotTags, err = p.PreparexContext(c, p.Rebind(_HotTags_TagsInfo)); err != nil {
 		return
 	}
-	if obj.TagsByKeywordA, err = p.PreparexContext(c, _TagsByKeywordA_TagsInfo); err != nil {
+	if obj.TagsByKeywordA, err = p.PreparexContext(c, p.Rebind(_TagsByKeywordA_TagsInfo)); err != nil {
 		return
 	}
-	if obj.TagsByKeywordB, err = p.PreparexContext(c, _TagsByKeywordB_TagsInfo); err != nil {
+	if obj.TagsByKeywordB, err = p.PreparexContext(c, p.Rebind(_TagsByKeywordB_TagsInfo)); err != nil {
 		return
 	}
-	if obj.InsertTag, err = p.PrepareNamedContext(c, _InsertTag_TagsInfo); err != nil {
+	if obj.InsertTag, err = p.PrepareNamedContext(c, p.Rebind(_InsertTag_TagsInfo)); err != nil {
 		return
 	}
-	if obj.NewestTags, err = p.PrepareNamedContext(c, _NewestTags_TagsInfo); err != nil {
+	if obj.NewestTags, err = p.PrepareNamedContext(c, p.Rebind(_NewestTags_TagsInfo)); err != nil {
 		return
 	}
 	return
@@ -216,19 +216,19 @@ func BuildTopic(p yesql.PreparexContext, ctx ...context.Context) (obj *Topic, er
 		TagsByIdB:    _TagsByIdB_Topic,
 		TagsForIncr:  _TagsForIncr_Topic,
 	}
-	if obj.HotTags, err = p.PreparexContext(c, _HotTags_Topic); err != nil {
+	if obj.HotTags, err = p.PreparexContext(c, p.Rebind(_HotTags_Topic)); err != nil {
 		return
 	}
-	if obj.TagsByKeywordA, err = p.PreparexContext(c, _TagsByKeywordA_Topic); err != nil {
+	if obj.TagsByKeywordA, err = p.PreparexContext(c, p.Rebind(_TagsByKeywordA_Topic)); err != nil {
 		return
 	}
-	if obj.TagsByKeywordB, err = p.PreparexContext(c, _TagsByKeywordB_Topic); err != nil {
+	if obj.TagsByKeywordB, err = p.PreparexContext(c, p.Rebind(_TagsByKeywordB_Topic)); err != nil {
 		return
 	}
-	if obj.InsertTag, err = p.PrepareNamedContext(c, _InsertTag_Topic); err != nil {
+	if obj.InsertTag, err = p.PrepareNamedContext(c, p.Rebind(_InsertTag_Topic)); err != nil {
 		return
 	}
-	if obj.NewestTags, err = p.PrepareNamedContext(c, _NewestTags_Topic); err != nil {
+	if obj.NewestTags, err = p.PrepareNamedContext(c, p.Rebind(_NewestTags_Topic)); err != nil {
 		return
 	}
 	return
