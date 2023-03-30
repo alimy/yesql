@@ -32,6 +32,12 @@ type SQLQuery interface {
 	SqlQuery(namespace string) (QueryMap, QueryMap, error)
 }
 
+// SQLParser sql file parser interface
+type SQLParser interface {
+	AddHooks(hooks ...func(query *Query) (*Query, error))
+	ParseReader(reader io.Reader) (SQLQuery, error)
+}
+
 // PrepareScanner scan object interface
 type PrepareScanner interface {
 	SetPrepareHook(hook PrepareHook)
@@ -61,12 +67,4 @@ type PreparexContext interface {
 
 	// PrepareNamedContext returns an sqlx.NamedStmt
 	PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error)
-}
-
-// SQLParser sql file parser interface
-type SQLParser interface {
-	SQLQuery
-
-	AddHooks(hooks ...func(query *Query) (*Query, error))
-	ParseReader(reader io.Reader) error
 }

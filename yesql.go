@@ -93,9 +93,10 @@ func MustParseBytes(b []byte, hooks ...func(query *Query) (*Query, error)) SQLQu
 
 // ParseReader takes an io.Reader and returns Queries or an error.
 func ParseReader(reader io.Reader, hooks ...func(query *Query) (*Query, error)) (SQLQuery, error) {
-	query := newSQLParser(_defaultQueryHooks...)
-	query.AddHooks(hooks...)
-	if err := query.ParseReader(reader); err != nil {
+	parser := newSQLParser(_defaultQueryHooks...)
+	parser.AddHooks(hooks...)
+	query, err := parser.ParseReader(reader)
+	if err != nil {
 		return nil, err
 	}
 	return query, nil

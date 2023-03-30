@@ -15,9 +15,10 @@ const (
 	lineQuery
 	lineComment
 	lineTag
-
-	tagName = "name"
 )
+
+// default tag name of sql clause in sql file
+const tagName = "name"
 
 var (
 	// -- tag: $value
@@ -27,6 +28,7 @@ var (
 	reComment = regexp.MustCompile(`^\s*--\s*(.*)`)
 
 	_ SQLParser = (*sqlParser)(nil)
+	_ SQLQuery  = (*sqlParser)(nil)
 )
 
 // ParsedLine stores line type and value
@@ -77,7 +79,7 @@ func (s *sqlParser) SqlQuery(namespace string) (QueryMap, QueryMap, error) {
 }
 
 // parseReader takes an io.Reader and returns Queries or an error.
-func (s *sqlParser) ParseReader(reader io.Reader) error {
+func (s *sqlParser) ParseReader(reader io.Reader) (SQLQuery, error) {
 	var (
 		nameTag   string
 		namespace string
@@ -96,7 +98,7 @@ func (s *sqlParser) ParseReader(reader io.Reader) error {
 		case lineQuery:
 			// Got a query but no preceding name tag.
 			if nameTag == "" {
-				return fmt.Errorf("Query is missing the 'name' tag: %s", line.Value)
+				return nil, fmt.Errorf("Query is missing the 'name' tag: %s", line.Value)
 			}
 
 			q := line.Value
@@ -135,7 +137,7 @@ func (s *sqlParser) ParseReader(reader io.Reader) error {
 				nameTag = strings.TrimLeft(nameTag, "$")
 
 				if _, ok := queries[nameTag]; ok {
-					return fmt.Errorf("Duplicate tag %s = %s ", line.Tag, line.Value)
+					return nil, fmt.Errorf("Duplicate tag %s = %s ", line.Tag, line.Value)
 				}
 
 				newQuery := &Query{Tags: make(map[string]string)}
@@ -147,7 +149,7 @@ func (s *sqlParser) ParseReader(reader io.Reader) error {
 			} else {
 				// Is there a name tag for this query?
 				if len(queryLine) > 0 {
-					return errors.New("'name' should be the first tag")
+					return nil, errors.New("'name' should be the first tag")
 				}
 
 				queries := s.defaultQueryMap
@@ -157,7 +159,7 @@ func (s *sqlParser) ParseReader(reader io.Reader) error {
 
 				// Has this tag already been used on this query?
 				if _, ok := queries[nameTag].Tags[line.Tag]; ok {
-					return fmt.Errorf("Duplicate tag %s = %s ", line.Tag, line.Value)
+					return nil, fmt.Errorf("Duplicate tag %s = %s ", line.Tag, line.Value)
 				}
 
 				if len(namespace) > 0 {
@@ -171,15 +173,15 @@ func (s *sqlParser) ParseReader(reader io.Reader) error {
 
 	err := scanner.Err()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err = s.checkQuery(); err != nil {
-		return err
+		return nil, err
 	}
 	if err = s.runHooks(); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return s, nil
 }
 
 func (s *sqlParser) checkQuery() error {
