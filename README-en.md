@@ -23,7 +23,9 @@ $ go get github.com/alimy/yesql
 -- name: newest_tags@topic
 -- get newest tag information
 SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin 
-FROM @tag t JOIN @user u ON t.user_id = u.id 
+FROM @tag t 
+JOIN @user u 
+ON t.user_id = u.id 
 WHERE t.is_del = 0 AND t.quote_num > 0 
 ORDER BY t.id DESC 
 LIMIT ? OFFSET ?;
@@ -31,7 +33,9 @@ LIMIT ? OFFSET ?;
 -- name: hot_tags@topic
 -- get get host tag information
 SELECT t.id id, t.user_id user_id, t.tag tag, t.quote_num quote_num, u.id, u.nickname, u.username, u.status, u.avatar, u.is_admin 
-FROM @tag t JOIN @user u ON t.user_id = u.id 
+FROM @tag t 
+JOIN @user u 
+ON t.user_id = u.id 
 WHERE t.is_del = 0 AND t.quote_num > 0 
 ORDER BY t.quote_num DESC 
 LIMIT ? OFFSET ?;
@@ -47,22 +51,27 @@ SELECT id, user_id, tag, quote_num FROM @tag WHERE is_del = 0 AND tag LIKE ? ORD
 INSERT INTO @tag (user_id, tag, created_on, modified_on, quote_num) VALUES (?, ?, ?, ?, 1);
 
 -- name: tags_by_id_a@topic
+-- prepare: raw
 -- clause: in
 SELECT id FROM @tag WHERE id IN (?) AND is_del = 0 AND quote_num > 0;
 
 -- name: tags_by_id_b@topic
+-- prepare: raw
 -- clause: in
 SELECT id, user_id, tag, quote_num FROM @tag WHERE id IN (?);
 
 -- name: decr_tags_by_id@topic
+-- prepare: raw
 -- clause: in
 UPDATE @tag SET quote_num=quote_num-1, modified_on=? WHERE id IN (?);
 
 -- name: tags_for_incr@topic
+-- prepare: raw
 -- clause: in
 SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);
 
 -- name: incr_tags_by_id@topic
+-- prepare: raw
 -- clause: in
 UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);
 ```
@@ -121,6 +130,7 @@ package main
 
 import (
 	"log"
+	"strings"
 
 	"github.com/alimy/yesql"
 )
@@ -128,6 +138,10 @@ import (
 //go:generate go run $GOFILE
 func main() {
 	log.Println("[Yesql] generate code start")
+	yesql.SetDefaultQueryHook(func(query *yesql.Query) (*yesql.Query, error) {
+		query.Query = strings.TrimRight(query.Query, ";")
+		return query, nil
+	})
 	if err := yesql.Generate("yesql.sql", "auto", "yesql"); err != nil {
 		log.Fatalf("generate code occurs error: %s", err)
 	}
