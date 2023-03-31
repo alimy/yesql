@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/alimy/yesql?status.svg)](https://pkg.go.dev/github.com/alimy/yesql)
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?logo=sourcegraph)](https://sourcegraph.com/github.com/alimy/yesql)
 
-Yesql解析一个SQL查询语句的文件，提取出SQL查询语句，自动生成对应包含sql查询语句的Go结构体，实现查询语句与代码分离，方便编写数据库查询逻辑。
+Yesql解析一个SQL文件，提取出查询语句，自动生成对应的Go结构体，实现查询语句与代码分离，方便编写数据库查询逻辑。
 
 > SQL解析核心基于 [knadh/goyesql](https://github.com/knadh/goyesql)，但是采用了不同的使用方式与接口定义。
 
