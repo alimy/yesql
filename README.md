@@ -15,7 +15,7 @@ $ go get github.com/alimy/yesql
 
 ### 使用
 
-#### 创建sql dml文件
+#### 创建sql文件
 
 ```sql
 -- sql file yesql.sql
