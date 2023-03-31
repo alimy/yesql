@@ -134,7 +134,7 @@ func main() {
 }
 ```
 
-* 使用下面命令将自动生成Go代码
+* 自动生成Go代码
 ```sh
 % go generate gen.go
 2023/03/31 19:34:44 [Yesql] generate code start
