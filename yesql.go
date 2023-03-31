@@ -138,3 +138,23 @@ func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option
 	}
 	return _defaultGenerator.Generate(dstPath, pkgName, query, opts...)
 }
+
+// MustBuild build a struct object than type of T
+func MustBuild[T any](p PrepareContext, fn func(PrepareBuilder, ...context.Context) (T, error), hook ...func(query string) string) T {
+	b := NewPrepareBuilder(p, hook...)
+	obj, err := fn(b)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// MustBuildx build a struct object than type of T
+func MustBuildx[T any](p PreparexContext, fn func(PreparexBuilder, ...context.Context) (T, error), hook ...func(query string) string) T {
+	b := NewPreparexBuilder(p, hook...)
+	obj, err := fn(b)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
