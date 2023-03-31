@@ -84,6 +84,7 @@ package topics
 
 import (
 	"context"
+	_ "embed"
 
 	"github.com/alimy/yesql"
 	"github.com/jmoiron/sqlx"
