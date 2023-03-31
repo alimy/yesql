@@ -147,7 +147,7 @@ func main() {
 // versions:
 // - Yesql v1.1.2
 
-package cc
+package yesql
 
 import (
 	"context"
