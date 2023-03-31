@@ -218,5 +218,5 @@ func BuildTopic(p yesql.PreparexBuilder, ctx ...context.Context) (obj *Topic, er
 
 ## 使用 [Yesql](https://github.com/alimy/yesql) 的项目
 * [examples](examples) - 项目examples
-* [paopao-ce](https://github.com/rocboss/paopao-ce/tree/r/paopao-ce-plus) - 一个清新文艺类Twitter的社区
+* [paopao-ce](https://github.com/rocboss/paopao-ce/tree/r/paopao-ce-plus) - 一个清新文艺的微社区
 
