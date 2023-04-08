@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -71,8 +72,8 @@ func (s *sqlParser) ListScope() ScopeQuery {
 	return s.scopeQuery
 }
 
-func (s *sqlParser) AllQuery() []*Query {
-	allQuery := make([]*Query, 0, len(s.queryMap))
+func (s *sqlParser) AllQuery() QueryList {
+	allQuery := make(QueryList, 0, len(s.queryMap))
 	for _, query := range s.queryMap {
 		allQuery = append(allQuery, query)
 	}
@@ -81,6 +82,7 @@ func (s *sqlParser) AllQuery() []*Query {
 			allQuery = append(allQuery, query)
 		}
 	}
+	sort.Sort(allQuery)
 	return allQuery
 }
 

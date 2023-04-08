@@ -8,11 +8,6 @@ default: run
 run:
 	go run gen.go
 
-.PHONY: mod-tidy
-mod-tidy:
-	@go mod download
-	@go mod tidy
-
 .PHONY: generate
 generate:
 	@go generate gen.go

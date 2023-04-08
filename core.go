@@ -37,6 +37,12 @@ type Query struct {
 	Tags  map[string]string
 }
 
+// QueryList query list
+type QueryList []*Query
+
+// QueryMap is a map associating a Tag to its Query
+type QueryMap map[string]*Query
+
 func (q *Query) PrepareStyle() string {
 	prepareStyle := PrepareStyleStmt
 	if style, exist := q.Tags["prepare"]; exist {
@@ -51,8 +57,17 @@ func (q *Query) PrepareStyle() string {
 	return prepareStyle
 }
 
-// QueryMap is a map associating a Tag to its Query
-type QueryMap map[string]*Query
+func (q QueryList) Len() int {
+	return len(q)
+}
+
+func (q QueryList) Less(i, j int) bool {
+	return q[i].Scope+"_"+q[i].Name < q[j].Scope+"_"+q[j].Name
+}
+
+func (q QueryList) Swap(i, j int) {
+	q[i], q[j] = q[j], q[i]
+}
 
 func (q QueryMap) FilterByStyle(style string) QueryMap {
 	qm := make(QueryMap, len(q))
@@ -94,7 +109,7 @@ type SQLQuery interface {
 	ListScope() ScopeQuery
 
 	// AllQuery get all *Query list
-	AllQuery() []*Query
+	AllQuery() QueryList
 }
 
 // SQLParser sql file parser interface
