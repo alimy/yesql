@@ -2,7 +2,12 @@
 [![Go](https://github.com/alimy/yesql/actions/workflows/go.yml/badge.svg)](https://github.com/alimy/yesql/actions/workflows/go.yml)
 [![GoDoc](https://godoc.org/github.com/alimy/yesql?status.svg)](https://pkg.go.dev/github.com/alimy/yesql)
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?logo=sourcegraph)](https://sourcegraph.com/github.com/alimy/yesql)
-
+<div align="center">
+  <a href="https://github.com/alimy/yesql">
+    <img src="https://alimy.me/yesql/images/yesql-logo.png" alt="Logo" width="240" height="240">
+  </a>
+  <h3 align="center">Yesql</h3>
+</div>
 Yesql parses a file and associate SQL queries to a map. Useful for separating SQL from code logic.
 
 > This package is based on [knadh/goyesql](https://github.com/knadh/goyesql) but is not compatible with it any more. This package introduces support for arbitrary tag types and changes structs and error types.
