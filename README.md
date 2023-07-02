@@ -4,7 +4,7 @@
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?logo=sourcegraph)](https://sourcegraph.com/github.com/alimy/yesql)
 <div align="center">
   <a href="https://github.com/alimy/yesql">
-    <img src="https://alimy.me/yesql/images/yesql-logo.png" alt="Logo" width="240" height="240">
+    <img src="https://alimy.me/yesql/images/yesql-logo.pngg" alt="Logo" width="240" height="240">
   </a>
   <h3 align="center">Yesql</h3>
 </div>
