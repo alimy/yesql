@@ -1,3 +1,8 @@
+---
+weight: 10
+title: "快速开始"
+---
+
 [![Go](https://github.com/alimy/yesql/actions/workflows/go.yml/badge.svg)](https://github.com/alimy/yesql/actions/workflows/go.yml)
 [![GoDoc](https://godoc.org/github.com/alimy/yesql?status.svg)](https://pkg.go.dev/github.com/alimy/yesql)
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?logo=sourcegraph)](https://sourcegraph.com/github.com/alimy/yesql)
@@ -12,9 +17,7 @@ Yesql解析一个SQL文件，提取出查询语句，自动生成对应的Go结�
 $ go get github.com/alimy/yesql
 ```
 
-### 使用
-
-#### 创建sql文件
+### 创建sql文件
 
 ```sql
 -- sql file yesql.sql
@@ -75,7 +78,7 @@ SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);
 UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);
 ```
 
-#### 使用Scan模式(方式一)
+### 使用Scan模式(方式一)
 ```go
 // file: topics.go
 
@@ -120,7 +123,7 @@ func NewTopic(db *sqlx.DB) (*Topic, error) {
 }
 ```
 
-#### 使用代码生成模式(方式二)
+### 使用代码生成模式(方式二)
 * 编写代码生成逻辑
 ```go
 // file: gen.go
@@ -229,8 +232,3 @@ func BuildTopic(p yesql.PreparexBuilder, ctx ...context.Context) (obj *Topic, er
 	return
 }
 ```
-
-### 使用Yesql的项目
-* [examples](examples) - 项目自带的Demo
-* [paopao-ce](https://github.com/rocboss/paopao-ce/tree/r/paopao-ce-plus) - 一个清新文艺的微社区
-

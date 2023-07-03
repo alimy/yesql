@@ -1,3 +1,8 @@
+---
+weight: 10
+title: "Quick Start"
+---
+
 [![Go](https://github.com/alimy/yesql/actions/workflows/go.yml/badge.svg)](https://github.com/alimy/yesql/actions/workflows/go.yml)
 [![GoDoc](https://godoc.org/github.com/alimy/yesql?status.svg)](https://pkg.go.dev/github.com/alimy/yesql)
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?logo=sourcegraph)](https://sourcegraph.com/github.com/alimy/yesql)
@@ -12,9 +17,7 @@ Yesql parses a file and associate SQL queries to a map. Useful for separating SQ
 $ go get github.com/alimy/yesql
 ```
 
-### Usage
-
-#### Create a file containing your SQL queries
+### Create a file containing your SQL queries
 
 ```sql
 -- sql file yesql.sql
@@ -75,7 +78,7 @@ SELECT id, user_id, tag, quote_num FROM @tag WHERE tag IN (?);
 UPDATE @tag SET quote_num=quote_num+1, is_del=0, modified_on=? WHERE id IN (?);
 ```
 
-#### Use scanning mode
+### Use scanning mode
 ```go
 // file: topics.go
 
@@ -120,7 +123,7 @@ func NewTopic(db *sqlx.DB) (*Topic, error) {
 }
 ```
 
-#### Use code generate mode
+### Use code generate mode
 
 * Create code generate logic
 ```go
@@ -229,8 +232,4 @@ func BuildTopic(p yesql.PreparexBuilder, ctx ...context.Context) (obj *Topic, er
 	}
 	return
 }
-```
-
-### Projects that used Yesql
-* [examples](examples) - examples in this project.
-* [paopao-ce](https://github.com/rocboss/paopao-ce/tree/r/paopao-ce-plus) - A artistic "twitter like" community built on gin+zinc+vue+ts.      
+```     
