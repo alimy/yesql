@@ -92,6 +92,18 @@ func (q QueryMap) IsRawQueryNotEmpty() bool {
 	return false
 }
 
+func (q QueryMap) IsStmtQueryNotEmpty() bool {
+	for _, query := range q {
+		switch query.PrepareStyle() {
+		case PrepareStyleStmt, PrepareStyleNamedStmt:
+			return true
+		default:
+			// nothing
+		}
+	}
+	return false
+}
+
 // ScopeQuery is a namespace QueryMap
 type ScopeQuery map[string]QueryMap
 

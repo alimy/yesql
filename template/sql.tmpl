@@ -33,13 +33,15 @@ type {{ naming $scope }} struct {
 {{end -}}
 
 {{if .DefaultQueryMapNotEmpty}}
-func Build{{ .DefaultStructName }}(p yesql.PrepareBuilder, ctx ...context.Context) (obj *{{ .DefaultStructName }}, err error) {
-	var c context.Context
+func Build{{ .DefaultStructName }}(p yesql.PrepareBuilder{{if .DefaultQueryMap.IsStmtQueryNotEmpty }}, ctx ...context.Context{{end}}) (obj *{{ .DefaultStructName }}, err error) {
+	{{- if .DefaultQueryMap.IsStmtQueryNotEmpty -}}
+    var c context.Context
 	if len(ctx) > 0 && ctx[0] != nil {
 		c = ctx[0]
 	} else {
 		c = context.Background()
 	}
+    {{- end}}
 	obj = &{{ .DefaultStructName }}{{if .DefaultQueryMap.IsRawQueryNotEmpty }}{
         {{range $name, $_ := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}),
         {{end}}}{{else}}{}{{end}}
@@ -50,13 +52,15 @@ func Build{{ .DefaultStructName }}(p yesql.PrepareBuilder, ctx ...context.Contex
 	return
 }{{end}}
 {{range $scope, $queryMap := .ScopeQuery }}
-func Build{{ naming $scope }}(p yesql.PrepareBuilder, ctx ...context.Context) (obj *{{ naming $scope }}, err error) {
+func Build{{ naming $scope }}(p yesql.PrepareBuilder{{if $queryMap.IsStmtQueryNotEmpty }}, ctx ...context.Context{{end}}) (obj *{{ naming $scope }}, err error) {
+     {{- if $queryMap.IsStmtQueryNotEmpty -}}
     var c context.Context
 	if len(ctx) > 0 && ctx[0] != nil {
 		c = ctx[0]
 	} else {
 		c = context.Background()
 	}
+    {{- end}}
 	obj = &{{naming $scope }}{{if $queryMap.IsRawQueryNotEmpty }}{
         {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}_{{ naming $scope }}),
         {{end}}}{{else}}{}{{end}}
