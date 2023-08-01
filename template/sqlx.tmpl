@@ -12,7 +12,7 @@ import (
 )
 
 const (
-    {{range .AllQuery }}_{{ naming .Name }}{{if notEmptyStr .Scope}}_{{ naming .Scope}}{{end}} = `{{ escape .Query }}`
+    {{range .AllQuery }}_{{if notEmptyStr .Scope}}{{ naming .Scope}}_{{end}}{{ naming .Name }} = `{{ escape .Query }}`
     {{end -}}
 )
 
@@ -70,14 +70,14 @@ func Build{{ naming $scope }}(p yesql.PreparexBuilder{{if $queryMap.IsStmtQueryN
 	}
     {{- end}}
 	obj = &{{naming $scope }}{{if $queryMap.IsRawQueryNotEmpty }}{
-        {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}_{{ naming $scope }}),
+        {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $scope }}_{{ naming $name}}),
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "stmt" }}
-    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}_{{ naming $scope }}))); err != nil {
+    if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(p.QueryHook(_{{ naming $scope }}_{{ naming $name }}))); err != nil {
 		return
 	}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "named_stmt" }}
-    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}_{{ naming $scope }}))); err != nil {
+    if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(p.QueryHook(_{{ naming $scope }}_{{ naming $name }}))); err != nil {
 		return
 	}{{end}}
     return
