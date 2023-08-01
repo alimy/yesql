@@ -26,13 +26,13 @@ type tmplCtx struct {
 }
 
 type simplePrepareBuilder struct {
-	p    PrepareContext
-	hook func(string) string
+	p     PrepareContext
+	hooks []func(string) string
 }
 
 type simplePreparexBuilder struct {
-	p    PreparexContext
-	hook func(string) string
+	p     PreparexContext
+	hooks []func(string) string
 }
 
 type sqlGenerator struct {
@@ -44,8 +44,8 @@ func (s *simplePrepareBuilder) PrepareContext(ctx context.Context, query string)
 }
 
 func (s *simplePrepareBuilder) QueryHook(query string) string {
-	if s.hook != nil {
-		return s.hook(query)
+	for _, h := range s.hooks {
+		query = h(query)
 	}
 	return query
 }
@@ -63,8 +63,8 @@ func (s *simplePreparexBuilder) Rebind(query string) string {
 }
 
 func (s *simplePreparexBuilder) QueryHook(query string) string {
-	if s.hook != nil {
-		return s.hook(query)
+	for _, h := range s.hooks {
+		query = h(query)
 	}
 	return query
 }
@@ -114,23 +114,27 @@ func (s *sqlGenerator) Generate(dstPath string, pkgName string, query SQLQuery, 
 }
 
 // NewPrepareBuilder create a simple prepare builder instance
-func NewPrepareBuilder(p PrepareContext, hook ...func(string) string) PrepareBuilder {
+func NewPrepareBuilder(p PrepareContext, hooks ...func(string) string) PrepareBuilder {
 	obj := &simplePrepareBuilder{
 		p: p,
 	}
-	if len(hook) > 0 && hook[0] != nil {
-		obj.hook = hook[0]
+	for _, h := range hooks {
+		if h != nil {
+			obj.hooks = append(obj.hooks, h)
+		}
 	}
 	return obj
 }
 
 // NewPreprarexBuilder create a simple preparex builder instance
-func NewPreparexBuilder(p PreparexContext, hook ...func(string) string) PreparexBuilder {
+func NewPreparexBuilder(p PreparexContext, hooks ...func(string) string) PreparexBuilder {
 	obj := &simplePreparexBuilder{
 		p: p,
 	}
-	if len(hook) > 0 && hook[0] != nil {
-		obj.hook = hook[0]
+	for _, h := range hooks {
+		if h != nil {
+			obj.hooks = append(obj.hooks, h)
+		}
 	}
 	return obj
 }
