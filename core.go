@@ -148,15 +148,15 @@ type PrepareContext interface {
 	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
 }
 
-// PreparexContext[T] enhances the Conn interface with context.
-type PreparexContext[T any] interface {
+// PreparexContext[T, S] enhances the Conn interface with context.
+type PreparexContext[T, S any] interface {
 	// PrepareContext prepares a statement.
 	// The provided context is used for the preparation of the statement, not for
 	// the execution of the statement.
 	PreparexContext(ctx context.Context, query string) (T, error)
 
 	// PrepareNamedContext returns an sqlx.NamedStmt
-	PrepareNamedContext(ctx context.Context, query string) (T, error)
+	PrepareNamedContext(ctx context.Context, query string) (S, error)
 
 	// Rebind rebind query to adapte SQL Driver
 	Rebind(query string) string
@@ -168,9 +168,9 @@ type PrepareBuilder interface {
 	QueryHook(query string) string
 }
 
-// PreparexBuilder preparex builder interface for sqlx
-type PreparexBuilder[T any] interface {
-	PreparexContext[T]
+// PreparexBuilder[T, S] preparex builder interface for sqlx
+type PreparexBuilder[T, S any] interface {
+	PreparexContext[T, S]
 	QueryHook(query string) string
 }
 

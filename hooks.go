@@ -8,15 +8,15 @@ import (
 
 var (
 	_ PrepareHook = (*stdPrepareHook)(nil)
-	_ PrepareHook = (*sqlxPrepareHook[any])(nil)
+	_ PrepareHook = (*sqlxPrepareHook[any, any])(nil)
 )
 
 type stdPrepareHook struct {
 	prepare PrepareContext
 }
 
-type sqlxPrepareHook[T any] struct {
-	prepare PreparexContext[T]
+type sqlxPrepareHook[T, S any] struct {
+	prepare PreparexContext[T, S]
 }
 
 func (s *stdPrepareHook) Prepare(field reflect.Type, query string) (any, error) {
@@ -53,7 +53,7 @@ func (s *stdPrepareHook) PrepareContext(ctx context.Context, field reflect.Type,
 	}
 }
 
-func (s *sqlxPrepareHook[T]) Prepare(field reflect.Type, query string) (any, error) {
+func (s *sqlxPrepareHook[T, S]) Prepare(field reflect.Type, query string) (any, error) {
 	switch field.String() {
 	case "string":
 		// Unprepared SQL query.
@@ -77,7 +77,7 @@ func (s *sqlxPrepareHook[T]) Prepare(field reflect.Type, query string) (any, err
 	}
 }
 
-func (s *sqlxPrepareHook[T]) PrepareContext(ctx context.Context, field reflect.Type, query string) (any, error) {
+func (s *sqlxPrepareHook[T, S]) PrepareContext(ctx context.Context, field reflect.Type, query string) (any, error) {
 	switch field.String() {
 	case "string":
 		// Unprepared SQL query.
@@ -109,8 +109,8 @@ func NewPrepareHook(p PrepareContext) PrepareHook {
 }
 
 // NewSqlxPrepareHook[T] create a prepare hook prepare that implement PreparexContext
-func NewSqlxPrepareHook[T any](p PreparexContext[T]) PrepareHook {
-	return &sqlxPrepareHook[T]{
+func NewSqlxPrepareHook[T, S any](p PreparexContext[T, S]) PrepareHook {
+	return &sqlxPrepareHook[T, S]{
 		prepare: p,
 	}
 }

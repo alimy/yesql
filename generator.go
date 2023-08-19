@@ -34,8 +34,8 @@ type simplePrepareBuilder struct {
 	hooks []func(string) string
 }
 
-type simplePreparexBuilder[T any] struct {
-	p     PreparexContext[T]
+type simplePreparexBuilder[T, S any] struct {
+	p     PreparexContext[T, S]
 	hooks []func(string) string
 }
 
@@ -54,19 +54,19 @@ func (s *simplePrepareBuilder) QueryHook(query string) string {
 	return query
 }
 
-func (s *simplePreparexBuilder[T]) PreparexContext(ctx context.Context, query string) (T, error) {
+func (s *simplePreparexBuilder[T, S]) PreparexContext(ctx context.Context, query string) (T, error) {
 	return s.p.PreparexContext(ctx, query)
 }
 
-func (s *simplePreparexBuilder[T]) PrepareNamedContext(ctx context.Context, query string) (T, error) {
+func (s *simplePreparexBuilder[T, S]) PrepareNamedContext(ctx context.Context, query string) (S, error) {
 	return s.p.PrepareNamedContext(ctx, query)
 }
 
-func (s *simplePreparexBuilder[T]) Rebind(query string) string {
+func (s *simplePreparexBuilder[T, S]) Rebind(query string) string {
 	return s.p.Rebind(query)
 }
 
-func (s *simplePreparexBuilder[T]) QueryHook(query string) string {
+func (s *simplePreparexBuilder[T, S]) QueryHook(query string) string {
 	for _, h := range s.hooks {
 		query = h(query)
 	}
@@ -132,9 +132,9 @@ func NewPrepareBuilder(p PrepareContext, hooks ...func(string) string) PrepareBu
 	return obj
 }
 
-// NewPreprarexBuilder[T] create a simple preparex builder instance
-func NewPreparexBuilder[T any](p PreparexContext[T], hooks ...func(string) string) PreparexBuilder[T] {
-	obj := &simplePreparexBuilder[T]{
+// NewPreprarexBuilder[T, S] create a simple preparex builder instance
+func NewPreparexBuilder[T, S any](p PreparexContext[T, S], hooks ...func(string) string) PreparexBuilder[T, S] {
+	obj := &simplePreparexBuilder[T, S]{
 		p: p,
 	}
 	for _, h := range hooks {

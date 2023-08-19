@@ -7,6 +7,7 @@ package yesql
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"fmt"
 	"io"
 	"os"
@@ -26,8 +27,8 @@ func Use(p PrepareContext) {
 	_defaultPrepareScanner = NewPrepareScanner(prepareHook)
 }
 
-// UseSqlx[T] use default prepare scanner withprepare that implement PreparexContext
-func UseSqlx[T any](p PreparexContext[T]) {
+// UseSqlx[T, S] use default prepare scanner withprepare that implement PreparexContext
+func UseSqlx[T, S any](p PreparexContext[T, S]) {
 	prepareHook := NewSqlxPrepareHook[T](p)
 	_defaultPrepareScanner = NewPrepareScanner(prepareHook)
 }
@@ -140,7 +141,7 @@ func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option
 }
 
 // MustBuild build a struct object than type of T
-func MustBuild[T any](p PrepareContext, fn func(PrepareBuilder, ...context.Context) (T, error), hook ...func(query string) string) T {
+func MustBuild(p PrepareContext, fn func(PrepareBuilder, ...context.Context) (*sql.Stmt, error), hook ...func(query string) string) *sql.Stmt {
 	b := NewPrepareBuilder(p, hook...)
 	obj, err := fn(b)
 	if err != nil {
@@ -149,8 +150,8 @@ func MustBuild[T any](p PrepareContext, fn func(PrepareBuilder, ...context.Conte
 	return obj
 }
 
-// MustBuildx[T] build a struct object than type of T
-func MustBuildx[T any](p PreparexContext[T], fn func(PreparexBuilder[T], ...context.Context) (T, error), hook ...func(query string) string) T {
+// MustBuildx[T, S] build a struct object than type of T
+func MustBuildx[T, S any](p PreparexContext[T, S], fn func(PreparexBuilder[T, S], ...context.Context) (T, error), hook ...func(query string) string) T {
 	b := NewPreparexBuilder(p, hook...)
 	obj, err := fn(b)
 	if err != nil {

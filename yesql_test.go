@@ -79,7 +79,7 @@ func TestScan(t *testing.T) {
 		t.Error("[q2] expected to fail at non-existent query 'does-not-exist' but didn't")
 	}
 
-	SetDefaultPrepareHook(NewSqlxPrepareHook[*sqlx.Stmt](nil))
+	SetDefaultPrepareHook(NewSqlxPrepareHook[*sqlx.Stmt, *sqlx.NamedStmt](nil))
 	if err = Scan(&q3, queries); err != nil {
 		t.Errorf("[q3] failed to scan raw query to struct: %s", err)
 	}
