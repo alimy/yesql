@@ -23,6 +23,7 @@ type Namespace struct{}
 type generateOption struct {
 	goFileName        string
 	defaultStructName string
+	sqlxPkgName       string
 }
 
 type option interface {
@@ -195,5 +196,11 @@ func DefaultStructNameOpt(name string) OptionFunc {
 func GoFileNameOpt(name string) OptionFunc {
 	return func(opt *generateOption) {
 		opt.goFileName = name
+	}
+}
+
+func SqlxPkgName(name string) OptionFunc {
+	return func(opt *generateOption) {
+		opt.sqlxPkgName = name
 	}
 }

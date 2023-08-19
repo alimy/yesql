@@ -12,12 +12,17 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const (
+	_defaultSqlxPkgName = "github.com/jmoiron/sqlx"
+)
+
 var (
 	_ Generator = (*sqlGenerator)(nil)
 )
 
 type tmplCtx struct {
 	PkgName           string
+	SqlxPkgName       string
 	DefaultStructName string
 	AllQuery          []*Query
 	DefaultQueryMap   QueryMap
@@ -77,12 +82,14 @@ func (s *sqlGenerator) Generate(dstPath string, pkgName string, query SQLQuery, 
 	opt := &generateOption{
 		goFileName:        "yesql.go",
 		defaultStructName: "Yesql",
+		sqlxPkgName:       _defaultSqlxPkgName,
 	}
 	for _, arg := range opts {
 		arg.apply(opt)
 	}
 	data := &tmplCtx{
 		PkgName:           pkgName,
+		SqlxPkgName:       opt.sqlxPkgName,
 		DefaultStructName: naming.Naming(opt.defaultStructName),
 		AllQuery:          query.AllQuery(),
 		ScopeQuery:        query.ListScope(),
