@@ -15,6 +15,9 @@ func main() {
 		return query, nil
 	})
 	opt := yesql.SqlxPkgName("github.com/bitbus/sqlx")
+	if err := yesql.Generate("yesql.sql", "auto", "yesql", opt); err != nil {
+		log.Fatalf("generate yesql code occurs error: %s", err)
+	}
 	if err := yesql.Generate("yesql_ac.sql", "auto/ac", "ac", opt); err != nil {
 		log.Fatalf("generate ac code occurs error: %s", err)
 	}
