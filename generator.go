@@ -9,7 +9,6 @@ import (
 
 	"github.com/alimy/yesql/naming"
 	"github.com/alimy/yesql/template"
-	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -35,8 +34,8 @@ type simplePrepareBuilder struct {
 	hooks []func(string) string
 }
 
-type simplePreparexBuilder struct {
-	p     PreparexContext
+type simplePreparexBuilder[T any] struct {
+	p     PreparexContext[T]
 	hooks []func(string) string
 }
 
@@ -55,19 +54,19 @@ func (s *simplePrepareBuilder) QueryHook(query string) string {
 	return query
 }
 
-func (s *simplePreparexBuilder) PreparexContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
+func (s *simplePreparexBuilder[T]) PreparexContext(ctx context.Context, query string) (T, error) {
 	return s.p.PreparexContext(ctx, query)
 }
 
-func (s *simplePreparexBuilder) PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
+func (s *simplePreparexBuilder[T]) PrepareNamedContext(ctx context.Context, query string) (T, error) {
 	return s.p.PrepareNamedContext(ctx, query)
 }
 
-func (s *simplePreparexBuilder) Rebind(query string) string {
+func (s *simplePreparexBuilder[T]) Rebind(query string) string {
 	return s.p.Rebind(query)
 }
 
-func (s *simplePreparexBuilder) QueryHook(query string) string {
+func (s *simplePreparexBuilder[T]) QueryHook(query string) string {
 	for _, h := range s.hooks {
 		query = h(query)
 	}
@@ -133,9 +132,9 @@ func NewPrepareBuilder(p PrepareContext, hooks ...func(string) string) PrepareBu
 	return obj
 }
 
-// NewPreprarexBuilder create a simple preparex builder instance
-func NewPreparexBuilder(p PreparexContext, hooks ...func(string) string) PreparexBuilder {
-	obj := &simplePreparexBuilder{
+// NewPreprarexBuilder[T] create a simple preparex builder instance
+func NewPreparexBuilder[T any](p PreparexContext[T], hooks ...func(string) string) PreparexBuilder[T] {
+	obj := &simplePreparexBuilder[T]{
 		p: p,
 	}
 	for _, h := range hooks {

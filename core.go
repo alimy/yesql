@@ -6,8 +6,6 @@ import (
 	"io"
 	"reflect"
 	"strings"
-
-	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -150,15 +148,15 @@ type PrepareContext interface {
 	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
 }
 
-// PreparexContext enhances the Conn interface with context.
-type PreparexContext interface {
+// PreparexContext[T] enhances the Conn interface with context.
+type PreparexContext[T any] interface {
 	// PrepareContext prepares a statement.
 	// The provided context is used for the preparation of the statement, not for
 	// the execution of the statement.
-	PreparexContext(ctx context.Context, query string) (*sqlx.Stmt, error)
+	PreparexContext(ctx context.Context, query string) (T, error)
 
 	// PrepareNamedContext returns an sqlx.NamedStmt
-	PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error)
+	PrepareNamedContext(ctx context.Context, query string) (T, error)
 
 	// Rebind rebind query to adapte SQL Driver
 	Rebind(query string) string
@@ -171,8 +169,8 @@ type PrepareBuilder interface {
 }
 
 // PreparexBuilder preparex builder interface for sqlx
-type PreparexBuilder interface {
-	PreparexContext
+type PreparexBuilder[T any] interface {
+	PreparexContext[T]
 	QueryHook(query string) string
 }
 

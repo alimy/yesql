@@ -16,6 +16,26 @@ const (
     {{end -}}
 )
 
+// PreparexContext enhances the Conn interface with context.
+type PreparexContext interface {
+	// PrepareContext prepares a statement.
+	// The provided context is used for the preparation of the statement, not for
+	// the execution of the statement.
+	PreparexContext(ctx context.Context, query string) (*sqlx.Stmt, error)
+
+	// PrepareNamedContext returns an sqlx.NamedStmt
+	PrepareNamedContext(ctx context.Context, query string) (*sqlx.NamedStmt, error)
+
+	// Rebind rebind query to adapte SQL Driver
+	Rebind(query string) string
+}
+
+// PreparexBuilder preparex builder interface for sqlx
+type PreparexBuilder interface {
+	PreparexContext
+	QueryHook(query string) string
+}
+
 {{if .DefaultQueryMapNotEmpty}}type {{ .DefaultStructName }} struct {
     {{range $name, $query := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}    {{if eq .PrepareStyle "stmt" }}*sqlx.Stmt{{else if eq .PrepareStyle "named_stmt"}}*sqlx.NamedStmt{{else}}string{{end}}    `yesql:"{{ $query.Name }}"`
     {{end}}
@@ -37,7 +57,7 @@ type {{ naming $scope }} struct {
 {{end -}}
 
 {{if .DefaultQueryMapNotEmpty}}
-func Build{{ .DefaultStructName }}(p yesql.PreparexBuilder{{if .DefaultQueryMap.IsStmtQueryNotEmpty }}, ctx ...context.Context{{end}}) (obj *{{ .DefaultStructName }}, err error) {
+func Build{{ .DefaultStructName }}(p PreparexBuilder{{if .DefaultQueryMap.IsStmtQueryNotEmpty }}, ctx ...context.Context{{end}}) (obj *{{ .DefaultStructName }}, err error) {
 	{{- if .DefaultQueryMap.IsStmtQueryNotEmpty -}}
     var c context.Context
 	if len(ctx) > 0 && ctx[0] != nil {
@@ -60,7 +80,7 @@ func Build{{ .DefaultStructName }}(p yesql.PreparexBuilder{{if .DefaultQueryMap.
 	return
 }{{end}}
 {{range $scope, $queryMap := .ScopeQuery }}
-func Build{{ naming $scope }}(p yesql.PreparexBuilder{{if $queryMap.IsStmtQueryNotEmpty }}, ctx ...context.Context{{end}}) (obj *{{ naming $scope }}, err error) {
+func Build{{ naming $scope }}(p PreparexBuilder{{if $queryMap.IsStmtQueryNotEmpty }}, ctx ...context.Context{{end}}) (obj *{{ naming $scope }}, err error) {
     {{- if $queryMap.IsStmtQueryNotEmpty -}}
     var c context.Context
 	if len(ctx) > 0 && ctx[0] != nil {

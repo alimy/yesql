@@ -1,3 +1,5 @@
+github.com/bitbus/sqlx v1.6.0 h1:ewrBydRkyHZqfOqvHVYpiBlqQtLn93B/loa2EwjpZ74=
+github.com/bitbus/sqlx v1.6.0/go.mod h1:MemKLfQ600g6PxUVsIDe48PlY3wOquyW2ApeiXoynFo=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/jmoiron/sqlx v1.3.5 h1:vFFPA71p1o5gAeqtEAwLU4dnX2napprKtHr7PYIcN3g=

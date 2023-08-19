@@ -26,9 +26,9 @@ func Use(p PrepareContext) {
 	_defaultPrepareScanner = NewPrepareScanner(prepareHook)
 }
 
-// UseSqlx use default prepare scanner withprepare that implement PreparexContext
-func UseSqlx(p PreparexContext) {
-	prepareHook := NewSqlxPrepareHook(p)
+// UseSqlx[T] use default prepare scanner withprepare that implement PreparexContext
+func UseSqlx[T any](p PreparexContext[T]) {
+	prepareHook := NewSqlxPrepareHook[T](p)
 	_defaultPrepareScanner = NewPrepareScanner(prepareHook)
 }
 
@@ -149,8 +149,8 @@ func MustBuild[T any](p PrepareContext, fn func(PrepareBuilder, ...context.Conte
 	return obj
 }
 
-// MustBuildx build a struct object than type of T
-func MustBuildx[T any](p PreparexContext, fn func(PreparexBuilder, ...context.Context) (T, error), hook ...func(query string) string) T {
+// MustBuildx[T] build a struct object than type of T
+func MustBuildx[T any](p PreparexContext[T], fn func(PreparexBuilder[T], ...context.Context) (T, error), hook ...func(query string) string) T {
 	b := NewPreparexBuilder(p, hook...)
 	obj, err := fn(b)
 	if err != nil {
