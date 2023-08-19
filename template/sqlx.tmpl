@@ -6,9 +6,14 @@ package {{ .PkgName }}
 
 import (
 	"context"
+    "fmt"
 
 	"{{ .SqlxPkgName }}"
     {{if .ScopeQueryNotEmpty}}"github.com/alimy/yesql"{{end}}
+)
+
+var (
+    _ = fmt.Errorf("error for placeholder")
 )
 
 const (
@@ -71,11 +76,11 @@ func Build{{ .DefaultStructName }}(p PreparexBuilder{{if .DefaultQueryMap.IsStmt
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "stmt" }}
     if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}))); err != nil {
-		return
+		return nil, fmt.Errorf("prepare _{{ naming $name }} error: %w", err)
 	}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "named_stmt" }}
     if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(p.QueryHook(_{{ naming $name }}))); err != nil {
-		return
+		return nil, fmt.Errorf("prepare _{{ naming $name }} error: %w", err)
 	}{{end}}
 	return
 }{{end}}
@@ -94,11 +99,11 @@ func Build{{ naming $scope }}(p PreparexBuilder{{if $queryMap.IsStmtQueryNotEmpt
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "stmt" }}
     if obj.{{ naming $name }}, err = p.PreparexContext(c, p.Rebind(p.QueryHook(_{{ naming $scope }}_{{ naming $name }}))); err != nil {
-		return
+		return nil, fmt.Errorf("prepare _{{ naming $scope }}_{{ naming $name }} error: %w", err)
 	}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "named_stmt" }}
     if obj.{{ naming $name }}, err = p.PrepareNamedContext(c, p.Rebind(p.QueryHook(_{{ naming $scope }}_{{ naming $name }}))); err != nil {
-		return
+		return nil, fmt.Errorf("prepare _{{ naming $scope }}_{{ naming $name }} error: %w", err)
 	}{{end}}
     return
 }

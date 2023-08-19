@@ -6,9 +6,14 @@ package {{ .PkgName }}
 
 import (
 	"context"
+    "fmt"
 	"database/sql"
 
 	{{if .ScopeQueryNotEmpty}}"github.com/alimy/yesql"{{end}}
+)
+
+var (
+    _ = fmt.Errorf("error for placeholder")
 )
 
 const (
@@ -47,7 +52,7 @@ func Build{{ .DefaultStructName }}(p yesql.PrepareBuilder{{if .DefaultQueryMap.I
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := .DefaultQueryMap.FilterByStyle "stmt" }}
     if obj.{{ naming $name }}, err = p.PrepareContext(c, p.QueryHook(_{{ naming $name }})); err != nil {
-		return
+		return nil, fmt.Errorf("prepare _{{ naming $name }} error: %w", err)
 	}{{end}}
 	return
 }{{end}}
@@ -66,7 +71,7 @@ func Build{{ naming $scope }}(p yesql.PrepareBuilder{{if $queryMap.IsStmtQueryNo
         {{end}}}{{else}}{}{{end}}
     {{- range $name, $_ := $queryMap.FilterByStyle "stmt" }}
     if obj.{{ naming $name }}, err = p.PrepareContext(c, p.QueryHook(_{{ naming $scope }}_{{ naming $name }})); err != nil {
-		return
+		return nil, fmt.Errorf("prepare _{{ naming $scope }}_{{ naming $name }} error: %w", err)
 	}{{end}}
     return
 }
