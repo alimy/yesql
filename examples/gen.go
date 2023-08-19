@@ -15,14 +15,14 @@ func main() {
 		return query, nil
 	})
 	opt := yesql.SqlxPkgName("github.com/bitbus/sqlx")
-	if err := yesql.Generate("yesql.sql", "auto", "yesql", opt); err != nil {
-		log.Fatalf("generate yesql code occurs error: %s", err)
+	sqlInfos := []yesql.SqlInfo{
+		yesql.NewSqlInfo("yesql.sql", "auto", "yesql"),
+		yesql.NewSqlInfo("yesql_ac.sql", "auto/ac", "ac"),
+		yesql.NewSqlInfo("yesql_bc.sql", "auto/bc", "bc"),
+		yesql.NewSqlInfo("yesql_cc.sql", "auto/cc", "cc"),
 	}
-	if err := yesql.Generate("yesql_ac.sql", "auto/ac", "ac", opt); err != nil {
-		log.Fatalf("generate ac code occurs error: %s", err)
-	}
-	if err := yesql.Generate("yesql_cc.sql", "auto/cc", "cc", opt); err != nil {
-		log.Fatalf("generate cc code occurs error: %s", err)
+	if err := yesql.GenerateFrom(sqlInfos, opt); err != nil {
+		log.Fatalf("generate code occurs error: %s", err)
 	}
 	log.Println("[Yesql] generate code finish")
 }

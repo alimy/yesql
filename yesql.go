@@ -21,6 +21,13 @@ var (
 	_defaultQueryHooks     []func(query *Query) (*Query, error)
 )
 
+// SqlInfo contain info for generate code
+type SqlInfo struct {
+	FilePath string
+	DestPath string
+	PkgName  string
+}
+
 // Use use default prepare scanner with prepare that implement PrepareContext
 func Use(p PrepareContext) {
 	prepareHook := NewPrepareHook(p)
@@ -131,6 +138,15 @@ func ScanContext(ctx context.Context, obj any, query SQLQuery, hook ...PrepareHo
 	return scanner.ScanContext(ctx, obj, query)
 }
 
+// NewSqlInfo create a SqlInfo instance
+func NewSqlInfo(sqlFilePath string, dstPath string, pkgName string) SqlInfo {
+	return SqlInfo{
+		FilePath: sqlFilePath,
+		DestPath: dstPath,
+		PkgName:  pkgName,
+	}
+}
+
 // Generate generate struct type autumatic by sql file with default generator
 func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option) error {
 	query, err := ParseFile(sqlFilePath)
@@ -138,6 +154,16 @@ func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option
 		return err
 	}
 	return _defaultGenerator.Generate(dstPath, pkgName, query, opts...)
+}
+
+// GenerateFrom  generate struct type autumatic from SqlInfo's inforamation with default generator
+func GenerateFrom(infos []SqlInfo, opts ...option) (err error) {
+	for _, s := range infos {
+		if err = Generate(s.FilePath, s.DestPath, s.PkgName, opts...); err != nil {
+			return
+		}
+	}
+	return
 }
 
 // MustBuild build a struct object than type of T

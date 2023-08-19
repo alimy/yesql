@@ -41,7 +41,7 @@ func Build{{ .DefaultStructName }}(p yesql.PrepareBuilder{{if .DefaultQueryMap.I
 	} else {
 		c = context.Background()
 	}
-    {{- end}}
+    {{- end }}
 	obj = &{{ .DefaultStructName }}{{if .DefaultQueryMap.IsRawQueryNotEmpty }}{
         {{range $name, $_ := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}),
         {{end}}}{{else}}{}{{end}}
@@ -60,7 +60,7 @@ func Build{{ naming $scope }}(p yesql.PrepareBuilder{{if $queryMap.IsStmtQueryNo
 	} else {
 		c = context.Background()
 	}
-    {{- end}}
+    {{- end }}
 	obj = &{{naming $scope }}{{if $queryMap.IsRawQueryNotEmpty }}{
         {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $scope }}_{{ naming $name }}),
         {{end}}}{{else}}{}{{end}}

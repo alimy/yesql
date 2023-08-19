@@ -65,7 +65,7 @@ func Build{{ .DefaultStructName }}(p PreparexBuilder{{if .DefaultQueryMap.IsStmt
 	} else {
 		c = context.Background()
 	}
-    {{- end}}
+    {{- end }}
 	obj = &{{ .DefaultStructName }}{{if .DefaultQueryMap.IsRawQueryNotEmpty }}{
         {{range $name, $_ := .DefaultQueryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $name}}),
         {{end}}}{{else}}{}{{end}}
@@ -88,7 +88,7 @@ func Build{{ naming $scope }}(p PreparexBuilder{{if $queryMap.IsStmtQueryNotEmpt
 	} else {
 		c = context.Background()
 	}
-    {{- end}}
+    {{- end }}
 	obj = &{{naming $scope }}{{if $queryMap.IsRawQueryNotEmpty }}{
         {{range $name, $_ := $queryMap.FilterByStyle "raw" }}{{ naming $name }}:    p.QueryHook(_{{ naming $scope }}_{{ naming $name}}),
         {{end}}}{{else}}{}{{end}}
