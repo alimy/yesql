@@ -179,25 +179,25 @@ type Generator interface {
 	Generate(dstPath string, pkgName string, query SQLQuery, opts ...option) error
 }
 
-type OptionFunc func(opt *generateOption)
+type OptFn func(opt *generateOption)
 
-func (f OptionFunc) apply(opt *generateOption) {
+func (f OptFn) apply(opt *generateOption) {
 	f(opt)
 }
 
-func DefaultStructNameOpt(name string) OptionFunc {
+func DefaultStructNameOpt(name string) OptFn {
 	return func(opt *generateOption) {
 		opt.defaultStructName = name
 	}
 }
 
-func GoFileNameOpt(name string) OptionFunc {
+func GoFileNameOpt(name string) OptFn {
 	return func(opt *generateOption) {
 		opt.goFileName = name
 	}
 }
 
-func SqlxPkgName(name string) OptionFunc {
+func SqlxPkgName(name string) OptFn {
 	return func(opt *generateOption) {
 		opt.sqlxPkgName = name
 	}

@@ -14,8 +14,12 @@ func main() {
 		query.Query = strings.TrimRight(query.Query, ";")
 		return query, nil
 	})
-	if err := yesql.Generate("yesql.sql", "auto", "yesql", yesql.SqlxPkgName("github.com/bitbus/sqlx")); err != nil {
-		log.Fatalf("generate code occurs error: %s", err)
+	opt := yesql.SqlxPkgName("github.com/bitbus/sqlx")
+	if err := yesql.Generate("yesql_ac.sql", "auto/ac", "ac", opt); err != nil {
+		log.Fatalf("generate ac code occurs error: %s", err)
+	}
+	if err := yesql.Generate("yesql_cc.sql", "auto/cc", "cc", opt); err != nil {
+		log.Fatalf("generate cc code occurs error: %s", err)
 	}
 	log.Println("[Yesql] generate code finish")
 }

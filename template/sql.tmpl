@@ -8,7 +8,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/alimy/yesql"
+	{{if .ScopeQueryNotEmpty}}"github.com/alimy/yesql"{{end}}
 )
 
 const (

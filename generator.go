@@ -77,6 +77,10 @@ func (t *tmplCtx) DefaultQueryMapNotEmpty() bool {
 	return len(t.DefaultQueryMap) != 0
 }
 
+func (t *tmplCtx) ScopeQueryNotEmpty() bool {
+	return len(t.ScopeQuery) != 0
+}
+
 func (s *sqlGenerator) Generate(dstPath string, pkgName string, query SQLQuery, opts ...option) (err error) {
 	opt := &generateOption{
 		goFileName:        "yesql.go",
