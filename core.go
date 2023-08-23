@@ -179,25 +179,29 @@ type Generator interface {
 	Generate(dstPath string, pkgName string, query SQLQuery, opts ...option) error
 }
 
+// OptFn option function
 type OptFn func(opt *generateOption)
 
 func (f OptFn) apply(opt *generateOption) {
 	f(opt)
 }
 
+// DefaultStructNameOpt set custom default global sql query struct name
 func DefaultStructNameOpt(name string) OptFn {
 	return func(opt *generateOption) {
 		opt.defaultStructName = name
 	}
 }
 
+// GoFileNameOpt set custom go file name to generate
 func GoFileNameOpt(name string) OptFn {
 	return func(opt *generateOption) {
 		opt.goFileName = name
 	}
 }
 
-func SqlxPkgName(name string) OptFn {
+// SqlxPkgNameOpt set sqlx pakcage name
+func SqlxPkgNameOpt(name string) OptFn {
 	return func(opt *generateOption) {
 		opt.sqlxPkgName = name
 	}

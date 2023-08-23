@@ -147,8 +147,8 @@ func NewSqlInfo(sqlFilePath string, dstPath string, pkgName string) SqlInfo {
 	}
 }
 
-// Generate generate struct type autumatic by sql file with default generator
-func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option) error {
+// GenerateBy generate struct type autumatic by sql file with default generator
+func GenerateBy(sqlFilePath string, dstPath string, pkgName string, opts ...option) error {
 	query, err := ParseFile(sqlFilePath)
 	if err != nil {
 		return err
@@ -159,7 +159,35 @@ func Generate(sqlFilePath string, dstPath string, pkgName string, opts ...option
 // GenerateFrom  generate struct type autumatic from SqlInfo's inforamation with default generator
 func GenerateFrom(infos []SqlInfo, opts ...option) (err error) {
 	for _, s := range infos {
-		if err = Generate(s.FilePath, s.DestPath, s.PkgName, opts...); err != nil {
+		if err = GenerateBy(s.FilePath, s.DestPath, s.PkgName, opts...); err != nil {
+			return
+		}
+	}
+	return
+}
+
+// Generate generate struct type autumatic by configFile with default generator
+func Generate(conf ...string) (err error) {
+	cfgFileName := "yesql.yaml"
+	if len(conf) > 0 && conf[0] != "" {
+		cfgFileName = conf[0]
+	}
+	cfg, xerr := yesqlConfFrom(cfgFileName)
+	if xerr != nil {
+		return err
+	}
+	for _, q := range cfg.Sql {
+		opts := []option{}
+		if q.Gen.DefaultStructName != "" {
+			opts = append(opts, DefaultStructNameOpt(q.Gen.DefaultStructName))
+		}
+		if q.Gen.GoFileName != "" {
+			opts = append(opts, GoFileNameOpt(q.Gen.GoFileName))
+		}
+		if q.Gen.SqlxPkgName != "" {
+			opts = append(opts, SqlxPkgNameOpt(q.Gen.SqlxPkgName))
+		}
+		if err = GenerateBy(q.Queries, q.Gen.Out, q.Gen.Package, opts...); err != nil {
 			return
 		}
 	}
